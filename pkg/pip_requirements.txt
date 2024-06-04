@@ -1,2 +1,5 @@
 google-auth==2.29.0
 google-cloud-compute==1.19.0
+google-cloud-iam
+fastapi==0.111.0
+uvicorn==0.30.0

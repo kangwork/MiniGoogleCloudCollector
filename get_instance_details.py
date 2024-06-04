@@ -43,6 +43,7 @@ if __name__ == '__main__':
     print(instance)  # Checking if the get_instance_details function works
 
     # Exit for now
+    print('Exiting...')
     exit()
 
     # Part 2: List all resources in a project
