@@ -8,8 +8,8 @@ from fastapi.exceptions import HTTPException
 # 1. Create a FastAPI app
 app = FastAPI()
 
+# Some other global variables
 project_id = "bluese-cloudone-20200113"
-zone = "us-west1-b"
 
 
 # 2. Define the routes
@@ -76,10 +76,14 @@ if __name__ == '__main__':
     print("Press Ctrl+C to stop the app")
 
     # TODO: This part of the code still needs to be fixed. There's an issue with fastAPI module imports.
-    print("\nAutomatic Deployment:")
-    print("Do you want to run the app now? (y/n): ")
-    choice = input()
-    if choice == 'y':
-        uvicorn.run(app, host="localhost", port=8000)
-    else:
-        print("Exiting...")
+    # print("\nAutomatic Deployment:")
+    # print("Do you want to run the app now? (y/n): ")
+    # choice = input()
+    # if choice == 'y':
+    # OPTION 1:
+    #     uvicorn.run(app, host="localhost", port=8000)
+    # OPTION 2:
+    #     exec_command = "uvicorn get_storage_buckets:app --reload"
+    #     os.system(exec_command)
+    # else:
+    #     print("Exiting...")
