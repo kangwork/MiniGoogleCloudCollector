@@ -4,12 +4,17 @@ import uvicorn
 from google.cloud import storage
 from credentials import get_credentials
 from fastapi.exceptions import HTTPException
+import logging
+logging.basicConfig(level=logging.INFO)
 
 # 1. Create a FastAPI app
 app = FastAPI()
 
 # Some other global variables
-project_id = "bluese-cloudone-20200113"
+# Note that this default_project_id is just an example;
+# for all the APIs, the user can specify the project ID in the URL query parameter.
+# E.g. /storage/buckets?project_id=YOUR_PROJECT
+default_project_id = "bluese-cloudone-20200113"
 
 
 # 2. Define the routes
@@ -19,19 +24,19 @@ def read_root():
     return {"message": f"""Welcome to the Mini Google Cloud Collector!
             
         Note:
-        The default project ID is {project_id}. If you want to change it, please add ?project_id=YOUR_PROJECT_ID to the URL.)
+        The default project ID is {default_project_id}. If you want to change it, please add ?project_id=YOUR_PROJECT_ID to the URL.)
         
         Avaialable Routes:
         Visit /storage/buckets to list all storage buckets in your project. 
-        (Example: /storage/buckets?project_id={project_id})
+        (Example: /storage/buckets?project_id={default_project_id})
 
         Visit /storage/buckets/BUCKET_NAME to get details of a specific storage bucket.
-        (Example: /storage/buckets/mini-collector-bucket?project_id={project_id})"""}
+        (Example: /storage/buckets/mini-collector-bucket?project_id={default_project_id})"""}
 
 
 # 2-2. A route to list all storage buckets in a project
 @app.get("/storage/buckets")
-def list_storage_buckets(project_id: str = project_id):
+def list_storage_buckets(project_id: str = default_project_id):
     credentials = get_credentials()
 
     try:
@@ -47,7 +52,7 @@ def list_storage_buckets(project_id: str = project_id):
 # Example use: http://localhost/storage/buckets/airbyte_testing_001?project_id=bluese-cloudone-20200113
 # 2-3. A route to get a storage bucket's details
 @app.get("/storage/buckets/{bucket_name}")
-def get_storage_bucket(bucket_name: str, project_id: str = project_id):
+def get_storage_bucket(bucket_name: str, project_id: str = default_project_id):
     credentials = get_credentials()
 
     try:
@@ -70,10 +75,16 @@ def get_storage_bucket(bucket_name: str, project_id: str = project_id):
 
 # # 3. Run the app
 if __name__ == '__main__':
-    print("Manual Deployment:")
-    print("The command `uvicorn get_storage_buckets:app --reload` will run the app")
-    print("You can visit http://localhost:8000 to check the app")
-    print("Press Ctrl+C to stop the app")
+    # Using python's logging package, record the log
+
+    # Manual Deployment
+    message = """
+    Manual Deployment:
+    The command `uvicorn get_storage_buckets:app --reload` will run the app.
+    You can visit http://localhost:8000 to check the app.
+    Press Ctrl+C to stop the app.
+    """
+    logging.info(message)
 
     # TODO: This part of the code still needs to be fixed. There's an issue with fastAPI module imports.
     # print("\nAutomatic Deployment:")
