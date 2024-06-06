@@ -69,7 +69,7 @@ def _stringify_role(role: dict, index: int = None, total: int = None) -> str:
     :param role: role dict(object of iam.Role), the role object
     """
     if index is not None and total is not None:
-        message = f"[Role {index+1} of {total}]"
+        message = f"\n[Role {index+1} of {total}]"
     else:
         message = "\n=====================================\n"
         message += "[Role]"
@@ -90,7 +90,7 @@ def _stringify_roles(roles: list) -> str:
     :param project_id: str, the project ID
     """
     logger.add_info("Printing all roles in the project.")
-    message = "\n=====================================\n"
+    message = "\n====================================="
     for i in range(len(roles)):
         message += _stringify_role(roles[i], i, len(roles))
     return message
