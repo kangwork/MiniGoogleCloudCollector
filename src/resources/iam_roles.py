@@ -43,13 +43,10 @@ class Role:
         self.included_permissions = role.included_permissions
 
     def __str__(self):
-        return f"""
-        
-        Role: {self.name}
-        Title: {self.title}
-        Description:
-        {self.description}
         """
+        Simplify the object representation for listing (role id)
+        """
+        return self.name
 
 # ==========================================================================
 ### 1. A function to return route messages
@@ -68,7 +65,7 @@ def get_route_messages(default_project_id: str) -> str:
 ### 2. Helper functions to get role objects
 
 # 2-1. A function to get a role's details
-def _get_role(role_id: int, logger: Logger) -> Role:
+def collect_resource(role_id: int, logger: Logger) -> Role:
     """
     Get a role's details
     
@@ -89,7 +86,7 @@ def _get_role(role_id: int, logger: Logger) -> Role:
 
 
 # 2-2. A function to get all roles in a project
-def _get_all_roles(logger: Logger) -> list[Role]:
+def collect_resources(logger: Logger) -> list[Role]:
     """
     Get all roles in a project
     
@@ -114,34 +111,7 @@ def _get_all_roles(logger: Logger) -> list[Role]:
 ### 3. Helper functions to stringify given role objects (deprecated)
 
 # ==========================================================================
-### 4. Wrapper functions to get and print role(s) in a project, using the helper functions
-
-# 4-1. A function to print a role's details
-def print_role(role_id: int, logger: Logger) -> str:
-    """
-    Print a role's details
-    
-    :param role_id, int, the role ID
-    """
-    role = _get_role(role_id, logger)
-    message = str(role)
-    return message
-
-
-# 4-2. A function to print all roles in a project
-def print_all_roles(logger: Logger) -> str:
-    """
-    Print all roles in a project
-
-    :param project_id: str, the project ID
-    """
-    roles = _get_all_roles(logger)
-    message = ""
-    for i in range(len(roles)):
-        message += f"\n[Role {i+1} of {len(roles)}]"
-        message += str(roles[i])
-    return message
-
+### 4. Wrapper functions to get and print role(s) in a project, using the helper functions (deprecated)
 
 # ==========================================================================
 # 5. Main function

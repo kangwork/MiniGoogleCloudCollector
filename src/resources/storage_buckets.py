@@ -29,15 +29,12 @@ class StorageBucket:
         self.created = bucket.time_created
 
     def __str__(self):
-        return f"""
-        
-        Bucket: {self.name}
-        Location: {self.location}
-        Storage Class: {self.storage_class}
-        Lifecycle Rules: {self.lifecycle_rules}
-        Labels: {self.labels}
-        Created: {self.created}
         """
+        Simplify the object representation for listing (bucket name)
+        """
+        return self.name
+    
+
 
 
 # 1. A function to return route messages
@@ -57,7 +54,7 @@ def get_route_messages(default_project_id: str) -> str:
 # 2. Helper functions to get storage bucket objects
 
 # 2-1. A function to get storage bucket objects
-def list_storage_buckets() -> dict:
+def collect_resources() -> list[StorageBucket]:
     credentials = get_credentials()
     project_id = credentials.project_id
 
@@ -66,24 +63,24 @@ def list_storage_buckets() -> dict:
         buckets = []
         for bucket in storage_client.list_buckets():
             buckets.append(StorageBucket(bucket))
-        return {"buckets": str(bucket) for bucket in buckets}
+        return buckets
     
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"[{__name__}] Failed to retrieve buckets: {str(e)}")
 
 
 # 2-2. A function to get a storage bucket's details
-def get_storage_bucket(bucket_name: str) -> StorageBucket:
+def collect_resource(bucket_name: str) -> StorageBucket:
     credentials = get_credentials()
     project_id = credentials.project_id
 
     try:
         storage_client = storage.Client(credentials=credentials, project=project_id)
         bucket = StorageBucket(storage_client.get_bucket(bucket_name))
-        return {"bucket": str(bucket)}
+        return bucket
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to retrieve bucket details: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"[{__name__}] Failed to retrieve bucket details: {str(e)}")
 
 
 # =============================================================================

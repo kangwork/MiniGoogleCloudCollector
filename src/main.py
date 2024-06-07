@@ -45,16 +45,17 @@ def read_root(request: Request):
 # 2-2-1. A route to list all storage buckets in a project
 @app.get("/storage/buckets")
 def list_storage_buckets():
-    message = storage_buckets.list_storage_buckets() # {"buckets": ["bucket1", "bucket2", ...]}
-    return {"data": message}
+    resources = storage_buckets.collect_resources() 
+    simplified_resources = [str(resource) for resource in resources]
+    return {"data": simplified_resources, "length": len(message), "message": "List of all storage buckets in the project."}
 
 
 # Example use: http://localhost/storage/buckets/airbyte_testing_001
 # 2-2-2. A route to get a storage bucket's details
 @app.get("/storage/buckets/{bucket_name}")
 def get_storage_bucket(bucket_name: str):
-    message = storage_buckets.get_storage_bucket(bucket_name) # {"bucket": {"name": "bucket1", "location": "us", ...}}
-    return {"data": message}
+    resource = storage_buckets.collect_resource(bucket_name) 
+    return {"data": resource, "message": "Details of the specific storage bucket."}
 
 
 ### 2-3. IAM Roles APIs
@@ -62,8 +63,9 @@ def get_storage_bucket(bucket_name: str):
 # Example use: http://localhost/iam/roles
 @app.get("/iam/roles")
 def list_iam_roles():
-    message = iam_roles.print_all_roles(logger)
-    return {"data": message}
+    resources = iam_roles.collect_resources(logger)
+    simplified_resources = [str(resource) for resource in resources]
+    return {"data": simplified_resources, "length": len(resources), "message": "List of all IAM roles in the project."}
 
 
 # Example use: http://localhost/iam/roles/609
@@ -71,25 +73,26 @@ def list_iam_roles():
 # 2-3-2. A route to get details of a specific IAM role
 @app.get("/iam/roles/{role_id}")
 def get_iam_role(role_id: int):
-    message = iam_roles.print_role(role_id, logger)
-    return {"data": message}
+    resource = iam_roles.collect_resource(role_id, logger)
+    return {"data": resource, "message": "Details of the specific IAM role."}
 
 
 ### 2-4. VM Instances APIs
 # 2-4-1. A route to list all VM instances in a project
 # Example use: http://localhost/vm/instances/us-west1-b
-@app.get("/vm/instances")
+@app.get("/vm/instances/{zone}")
 def list_vm_instances():
-    message = vm_instances.list_instances()
-    return {"data": message}
+    resources = vm_instances.collect_resources() 
+    simplified_resources = [str(resource) for resource in resources]
+    return {"data": simplified_resources, "length": len(resources), "message": "List of all VM instances in the project."}
 
 
 # Example use: http://localhost/vm/instances/us-west1-b/mini-collector-instance
 # 2-4-2. A route to get details of a specific VM instance
 @app.get("/vm/instances/{zone}/{instance_name}")
 def get_vm_instance(zone: str, instance_name: str):
-    message = vm_instances.get_instance_details(zone, instance_name)
-    return {"data": message}
+    resource = vm_instances.collect_resource(zone, instance_name)
+    return {"data": resource, "message": "Details of the specific VM instance."}
 
 
 # =============================================================================

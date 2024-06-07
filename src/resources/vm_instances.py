@@ -29,17 +29,10 @@ class VMInstance:
         self.metadata = instance.metadata
 
     def __str__(self):
-        return f"""
-        
-        Instance: {self.name}
-        Zone: {self.zone}
-        Machine Type: {self.machine_type}
-        Status: {self.status}
-        Creation Time: {self.creation_time}
-        Disks: {self.disks}
-        Network Interfaces: {self.network_interfaces}
-        Metadata: {self.metadata}
         """
+        Simplify the object representation for listing (instance name)
+        """
+        return self.name
 
 # 1. A function to return route messages
 def get_route_messages(default_project_id: str) -> str:
@@ -57,14 +50,14 @@ def get_route_messages(default_project_id: str) -> str:
 # 2. Helper functions to get instance objects (VM Instances)
 
 # 2-1. A function to list all instances in a project
-def list_instances(zone: str) -> dict:
+def collect_resources(zone: str) -> list[VMInstance]:
     """
     List all instances in a project
 
     :param project_id: str, the project ID
     :param zone: str, the zone
 
-    :return: list of instances
+    :return: list of instances[VMInstance]
     """
     credentials = get_credentials()
     project_id = credentials.project_id
@@ -75,13 +68,13 @@ def list_instances(zone: str) -> dict:
         instances = []
         for instance in instance_client.list(request=request):
             instances.append(VMInstance(instance))
-        return {"instances": str(instance) for instance in instances}
+        return instances
     except Exception as e:
-        return HTTPException(status_code=500, detail=f"Failed to retrieve buckets: {str(e)}")
+        return HTTPException(status_code=500, detail=f"[{__name__}] Failed to retrieve buckets: {str(e)}")
 
 
 # 2-2. A function to get details of a specific instance
-def get_instance_details(zone: str, instance_name: str) -> VMInstance:
+def collect_resource(zone: str, instance_name: str) -> VMInstance:
     """
     Get details of a specific instance
 
@@ -97,9 +90,9 @@ def get_instance_details(zone: str, instance_name: str) -> VMInstance:
     try:
         instance_client = compute_v1.InstancesClient(credentials=credentials)
         request = compute_v1.GetInstanceRequest(project=project_id, zone=zone, instance=instance_name)
-        return str(VMInstance(instance_client.get(request=request)))
+        return VMInstance(instance_client.get(request=request))
     except Exception as e:
-        return HTTPException(status_code=500, detail=f"Failed to retrieve buckets: {str(e)}")
+        return HTTPException(status_code=500, detail=f"[{__name__}] Failed to retrieve buckets: {str(e)}")
 
 
 # =============================================================================
