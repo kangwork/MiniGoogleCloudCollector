@@ -1,5 +1,5 @@
 from google.cloud import compute_v1
-from credentials import get_credentials
+from ..utils.credentials import get_credentials
 
 # A function to list all instances in a project
 def list_instances(project_id: str, zone: str):

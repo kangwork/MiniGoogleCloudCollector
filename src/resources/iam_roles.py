@@ -1,6 +1,6 @@
 from google.cloud import iam_admin_v1 as iam
-from credentials import get_credentials
-from utils.logging import Logger, setup_logger
+from ..utils.credentials import get_credentials
+from ..utils.logging import Logger, setup_logger
 
 ### This module is divided into 4 categories of functions:
 # 1. Helper functions to get role objects

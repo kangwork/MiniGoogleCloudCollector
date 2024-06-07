@@ -2,9 +2,9 @@ import os
 from fastapi import FastAPI
 import uvicorn
 from google.cloud import storage
-from credentials import get_credentials
+from ..utils.credentials import get_credentials
 from fastapi.exceptions import HTTPException
-from utils.logging import Logger, setup_logger
+from ..utils.logging import Logger, setup_logger
 from iam_roles import print_all_roles, print_role
 
 
