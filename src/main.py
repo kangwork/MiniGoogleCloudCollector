@@ -85,6 +85,7 @@ def list_iam_roles(project_id: str = default_project_id):
     message = iam_roles.print_all_roles(project_id, logger)
     return {"roles": message}
 
+
 # Example use: http://localhost/iam/roles/609?project_id=bluese-cloudone-20200113
 # Example use: http://localhost/iam/roles/261
 # 2-3-2. A route to get details of a specific IAM role
@@ -103,6 +104,7 @@ def list_vm_instances(project_id: str = default_project_id):
     message = vm_instances.list_instances(project_id)
     return {"instances": message}
 
+
 # Example use: http://localhost/vm/instances/us-west1-b/mini-collector-instance?project_id=bluese-cloudone-20200113
 # 2-4-2. A route to get details of a specific VM instance
 @app.get("/vm/instances/{zone}/{instance_name}")
@@ -110,7 +112,7 @@ def get_vm_instance(zone: str, instance_name: str, project_id: str = default_pro
     message = vm_instances.get_instance_details(project_id, zone, instance_name)
     return {"instance": message}
 
-# # 3. Run the app
+# 3. Run the app
 if __name__ == '__main__':
     # This logger refers to the global logger
     # TODO
