@@ -11,24 +11,27 @@ class Logger:
     - _file_handler: logging.FileHandler, the file handler
     - _stream_handler: logging.StreamHandler, the stream handler
     - _formatter: logging.Formatter, the formatter
-    - _log_file: str, the log file path
     """
-    def __init__(self, log_file: str | None = None):
+    def __init__(self):
         self._logger = logging.getLogger("MiniGoogleCloudCollector")
         self._logger.setLevel(logging.INFO)
         self._formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-        self._log_file = log_file
-
-        if log_file:
-            # File Handler(For File Output)
-            self._file_handler = logging.FileHandler(self._log_file)
-            self._file_handler.setFormatter(self._formatter)
-            self._logger.addHandler(self._file_handler)
-        else:
-            # Stream Handler(For Console Output)
-            self._stream_handler = logging.StreamHandler()
-            self._stream_handler.setFormatter(self._formatter)
-            self._logger.addHandler(self._stream_handler)
+        self._file_handler = None
+        self._stream_handler = None
+        return
+    
+    def set_file_handler(self, log_file: str):
+        # File Handler(For File Output)
+        self._file_handler = logging.FileHandler(log_file)
+        self._file_handler.setFormatter(self._formatter)
+        self._logger.addHandler(self._file_handler)
+        return
+    
+    def set_stream_handler(self):
+        # Stream Handler(For Console Output)
+        self._stream_handler = logging.StreamHandler()
+        self._stream_handler.setFormatter(self._formatter)
+        self._logger.addHandler(self._stream_handler)
         return
 
     def add_info(self, message: str):
@@ -46,19 +49,20 @@ class Logger:
     def add_critical(self, message: str):
         self._logger.critical(message)
 
-def setup_logger() -> Logger:
+
+def setup_logger(logger: Logger) -> Logger:
     """
     Ask a user if they want to log the output in a file or on the console
     """
     print("Do you want to log the output in a file? (y/n):")
     choice = input()
     if choice == 'y':
-        logger = Logger("log.log")
+        logger.set_file_handler("log.log")
 
         # Clear the log file (Overwrite)
         with open("log.log", "w") as f:
             f.write("")
     else:
-        logger = Logger()
+        logger.set_stream_handler()
     logger.add_info("Starting the program.")
     return logger
