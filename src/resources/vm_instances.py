@@ -3,6 +3,44 @@ from utils.credentials import get_credentials
 from fastapi.exceptions import HTTPException
 from utils.logging import Logger, setup_logger
 
+# 0. A class to represent a VM Instance
+class VMInstance:
+    """
+    A class to represent a VM Instance
+
+    Attributes:
+    - name: str, the instance name
+    - zone: str, the instance zone
+    - machine_type: str, the instance machine type
+    - status: str, the instance status
+    - creation_time: datetime, the instance creation time
+    - disks: list, the instance disks
+    - network_interfaces: list, the instance network interfaces
+    - metadata: dict, the instance metadata
+    """
+    def __init__(self, instance: dict):
+        self.name = instance.name
+        self.zone = instance.zone
+        self.machine_type = instance.machine_type
+        self.status = instance.status
+        self.creation_time = instance.creation_timestamp
+        self.disks = instance.disks
+        self.network_interfaces = instance.network_interfaces
+        self.metadata = instance.metadata
+
+    def __str__(self):
+        return f"""
+        
+        Instance: {self.name}
+        Zone: {self.zone}
+        Machine Type: {self.machine_type}
+        Status: {self.status}
+        Creation Time: {self.creation_time}
+        Disks: {self.disks}
+        Network Interfaces: {self.network_interfaces}
+        Metadata: {self.metadata}
+        """
+
 # 1. A function to return route messages
 def get_route_messages(default_project_id: str) -> str:
     return f"""
@@ -34,13 +72,16 @@ def list_instances(zone: str) -> dict:
     try:
         instance_client = compute_v1.InstancesClient(credentials=credentials)
         request = compute_v1.ListInstancesRequest(project=project_id, zone=zone)  # NOTE: Check if zone is required  --> Yes, it is required
-        return {"instances": instance_client.list(request=request)}
+        instances = []
+        for instance in instance_client.list(request=request):
+            instances.append(VMInstance(instance))
+        return {"instances": str(instance) for instance in instances}
     except Exception as e:
         return HTTPException(status_code=500, detail=f"Failed to retrieve buckets: {str(e)}")
 
 
 # 2-2. A function to get details of a specific instance
-def get_instance_details(zone: str, instance_name: str) -> dict:
+def get_instance_details(zone: str, instance_name: str) -> VMInstance:
     """
     Get details of a specific instance
 
@@ -56,7 +97,7 @@ def get_instance_details(zone: str, instance_name: str) -> dict:
     try:
         instance_client = compute_v1.InstancesClient(credentials=credentials)
         request = compute_v1.GetInstanceRequest(project=project_id, zone=zone, instance=instance_name)
-        return instance_client.get(request=request)
+        return str(VMInstance(instance_client.get(request=request)))
     except Exception as e:
         return HTTPException(status_code=500, detail=f"Failed to retrieve buckets: {str(e)}")
 

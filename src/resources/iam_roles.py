@@ -3,13 +3,15 @@ from utils.credentials import get_credentials
 from utils.logging import Logger, setup_logger
 
 ### This module is divided into 5 categories of functions:
+# 0. A class to represent a Role
+#
 # 1. A function to return route messages (used in the ../main.py)
 #    - get_route_messages(default_project_id: str) -> str
 # 2. Helper functions to get role objects
 #     - _get_role(project_id: str, role_id: int) -> dict
 #     - _get_all_roles(project_id: str) -> list
 #
-# 3. Helper functions to stringify given role objects
+# -. Helper functions to stringify given role objects (deprecated)
 #     - _stringify_role(role: dict, index: int = None, total: int = None) -> str
 #     - _stringify_roles(roles: list) -> str
 #
@@ -19,6 +21,35 @@ from utils.logging import Logger, setup_logger
 #
 # 5. Main function
 ###
+
+# ==========================================================================
+# 0. A class to represent a Role
+class Role:
+    """
+    A class to represent a Role
+
+    Attributes:
+    - name: str, the role name
+    - title: str, the role title
+    - description: str, the role description
+    - stage: str, the role stage
+    - included_permissions: list, the role's included permissions
+    """
+    def __init__(self, role: dict):
+        self.name = role.name
+        self.title = role.title
+        self.description = role.description
+        self.stage = role.stage
+        self.included_permissions = role.included_permissions
+
+    def __str__(self):
+        return f"""
+        
+        Role: {self.name}
+        Title: {self.title}
+        Description:
+        {self.description}
+        """
 
 # ==========================================================================
 ### 1. A function to return route messages
@@ -37,7 +68,7 @@ def get_route_messages(default_project_id: str) -> str:
 ### 2. Helper functions to get role objects
 
 # 2-1. A function to get a role's details
-def _get_role(role_id: int, logger: Logger) -> dict:
+def _get_role(role_id: int, logger: Logger) -> Role:
     """
     Get a role's details
     
@@ -47,19 +78,18 @@ def _get_role(role_id: int, logger: Logger) -> dict:
     credentials = get_credentials()
     project_id = credentials.project_id
     role_name = f'projects/{project_id}/roles/{str(role_id)}'
-    logger.add_info(f"Getting role: {role_name}")
     try:
         client = iam.IAMClient(credentials=credentials)
         request = iam.GetRoleRequest(name=role_name)
         response = client.get_role(request=request)
-        return response
+        return Role(response)
     except Exception as e:
-        logger.add_error(f"Failed to get role: {str(e)}")
+        logger.add_error(f"[{__name__}] Failed to get role: {str(e)}")
         return None
 
 
 # 2-2. A function to get all roles in a project
-def _get_all_roles(logger: Logger) -> list:
+def _get_all_roles(logger: Logger) -> list[Role]:
     """
     Get all roles in a project
     
@@ -69,53 +99,19 @@ def _get_all_roles(logger: Logger) -> list:
     """
     credentials = get_credentials()
     project_id = credentials.project_id
-    logger.add_info("Getting all roles in the project.")
     try:
         client = iam.IAMClient(credentials=credentials)
         request = iam.ListRolesRequest(parent=f'projects/{project_id}')
         response = client.list_roles(request=request)
-        return response.roles
+        roles = [Role(role) for role in response.roles]
+        return roles
     except Exception as e:
-        logger.add_error(f"Failed to get all roles: {str(e)}")
+        logger.add_error(f"[{__name__}] Failed to get all roles: {str(e)}")
         return None
 
 
 # ==========================================================================
-### 3. Helper functions to stringify given role objects
-
-# 3-1. A function to print a role's details
-def _stringify_role(role: dict, index: int = None, total: int = None) -> str:
-    """
-    Print a role's details
-    
-    :param role: role dict(object of iam.Role), the role object
-    """
-    if index is not None and total is not None:
-        message = f"\n[Role {index+1} of {total}]"
-    else:
-        message = "\n=====================================\n"
-        message += "[Role]"
-    message += (f"""
-    Role: {role.name}
-    Title: {role.title}
-    Description:
-    {role.description}
-=====================================""")
-    return message
-
-
-# 3-2. A function to print a list of roles
-def _stringify_roles(roles: list) -> str:
-    """
-    Print all roles in a project
-
-    :param project_id: str, the project ID
-    """
-    message = "\n====================================="
-    for i in range(len(roles)):
-        message += _stringify_role(roles[i], i, len(roles))
-    return message
-
+### 3. Helper functions to stringify given role objects (deprecated)
 
 # ==========================================================================
 ### 4. Wrapper functions to get and print role(s) in a project, using the helper functions
@@ -128,8 +124,7 @@ def print_role(role_id: int, logger: Logger) -> str:
     :param role_id, int, the role ID
     """
     role = _get_role(role_id, logger)
-    message = _stringify_role(role)
-    # logger.add_info(message)
+    message = str(role)
     return message
 
 
@@ -141,9 +136,10 @@ def print_all_roles(logger: Logger) -> str:
     :param project_id: str, the project ID
     """
     roles = _get_all_roles(logger)
-    logger.add_info("Printing all roles in the project.")
-    message = _stringify_roles(roles)
-    # logger.add_info(message)
+    message = ""
+    for i in range(len(roles)):
+        message += f"\n[Role {i+1} of {len(roles)}]"
+        message += str(roles[i])
     return message
 
 
