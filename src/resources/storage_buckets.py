@@ -7,29 +7,26 @@ from fastapi.exceptions import HTTPException
 from utils.logging import Logger, setup_logger
 
 
-# 1. Create a FastAPI app
-app = FastAPI()
-
-# Some other global variables
-# Note that this default_project_id is just an example;
-# for all the APIs, the user can specify the project ID in the URL query parameter.
-# E.g. /storage/buckets?project_id=YOUR_PROJECT
-logger = Logger()
-
+# 1. A function to return route messages
 def get_route_messages(default_project_id: str) -> str:
     return f"""
 
         Visit /storage/buckets to list all storage buckets in your project. 
-        (Example: /storage/buckets?project_id={default_project_id})
+        (Example: /storage/buckets)
 
         Visit /storage/buckets/BUCKET_NAME to get details of a specific storage bucket.
-        (Example: /storage/buckets/mini-collector-bucket?project_id={default_project_id})
+        (Example: /storage/buckets/mini-collector-bucket)
         
         """
 
-# Example use: http://localhost/storage/buckets/airbyte_testing_001?project_id=bluese-cloudone-20200113
-def list_storage_buckets(project_id: str) -> dict:
+
+# =============================================================================
+# 2. Helper functions to get storage bucket objects
+
+# 2-1. A function to get storage bucket objects
+def list_storage_buckets() -> dict:
     credentials = get_credentials()
+    project_id = credentials.project_id
 
     try:
         storage_client = storage.Client(credentials=credentials, project=project_id)
@@ -41,9 +38,10 @@ def list_storage_buckets(project_id: str) -> dict:
         raise HTTPException(status_code=500, detail=f"Failed to retrieve buckets: {str(e)}")
 
 
-# Example use: http://localhost/storage/buckets/airbyte_testing_001?project_id=bluese-cloudone-20200113
-def get_storage_bucket(bucket_name: str, project_id: str) -> dict:
+# 2-2. A function to get a storage bucket's details
+def get_storage_bucket(bucket_name: str) -> dict:
     credentials = get_credentials()
+    project_id = credentials.project_id
 
     try:
         storage_client = storage.Client(credentials=credentials, project=project_id)
@@ -63,9 +61,11 @@ def get_storage_bucket(bucket_name: str, project_id: str) -> dict:
         raise HTTPException(status_code=500, detail=f"Failed to retrieve bucket details: {str(e)}")
 
 
-# 3. Run the app
+# =============================================================================
+# 3. Main function
 if __name__ == '__main__':
-    logger = setup_logger()
+    logger = Logger()
+    setup_logger(logger, to_file=False)
     logger.add_info("This app cannot be run directly. Please run the main.py file.")
     logger.add_info("Exiting.")
     exit(0)

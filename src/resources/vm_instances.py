@@ -1,21 +1,25 @@
 from google.cloud import compute_v1
 from utils.credentials import get_credentials
 from fastapi.exceptions import HTTPException
+from utils.logging import Logger, setup_logger
 
-# A function to return route messages
+# 1. A function to return route messages
 def get_route_messages(default_project_id: str) -> str:
     return f"""
     
-        Visit /vm/instances to list all VM instances in your project. 
-        (Example: /vm/instances?project_id={default_project_id})
+        Visit /vm/instances to list all VM instances in your project. Include zone as a query parameter.
+        (Example: /vm/instances?zone=us-west1-b)
         
         Visit /vm/instances/ZONE/INSTANCE_NAME to get details of a specific VM instance.
-        (Example: /vm/instances/us-west1-b/mini-collector-instance?project_id={default_project_id})
+        (Example: /vm/instances/us-west1-b/mini-collector-instance)
         
         """
 
-# A function to list all instances in a project
-def list_instances(project_id: str, zone: str) -> dict:
+# =============================================================================
+# 2. Helper functions to get instance objects (VM Instances)
+
+# 2-1. A function to list all instances in a project
+def list_instances(zone: str) -> dict:
     """
     List all instances in a project
 
@@ -25,15 +29,18 @@ def list_instances(project_id: str, zone: str) -> dict:
     :return: list of instances
     """
     credentials = get_credentials()
+    project_id = credentials.project_id
+
     try:
         instance_client = compute_v1.InstancesClient(credentials=credentials)
-        request = compute_v1.ListInstancesRequest(project=project_id, zone=zone)
+        request = compute_v1.ListInstancesRequest(project=project_id, zone=zone)  # NOTE: Check if zone is required  --> Yes, it is required
         return {"instances": instance_client.list(request=request)}
     except Exception as e:
         return HTTPException(status_code=500, detail=f"Failed to retrieve buckets: {str(e)}")
 
-# A function to get details of a specific instance
-def get_instance_details(project_id: str, zone, instance_name) -> dict:
+
+# 2-2. A function to get details of a specific instance
+def get_instance_details(zone: str, instance_name: str) -> dict:
     """
     Get details of a specific instance
 
@@ -44,6 +51,8 @@ def get_instance_details(project_id: str, zone, instance_name) -> dict:
     :return: instance details
     """
     credentials = get_credentials()
+    project_id = credentials.project_id
+
     try:
         instance_client = compute_v1.InstancesClient(credentials=credentials)
         request = compute_v1.GetInstanceRequest(project=project_id, zone=zone, instance=instance_name)
@@ -52,24 +61,30 @@ def get_instance_details(project_id: str, zone, instance_name) -> dict:
         return HTTPException(status_code=500, detail=f"Failed to retrieve buckets: {str(e)}")
 
 
+# =============================================================================
+# 3. Main function
 if __name__ == '__main__':
+    logger = Logger()
+    setup_logger(logger, to_file=False)
+    logger.add_info("This app cannot be run directly. Please run the main.py file.")
+    logger.add_info("Exiting.")
+    exit()
 
-    # Example use
-    project_id = "bluese-cloudone-20200113"
-    zone = "us-west1-b"
-    instance_name = "mini-collector-instance"
+    # For DEBUGGING purposes =================================================
+    # zone = "us-west1-b"
+    # instance_name = "mini-collector-instance"
 
-    # Part 1: Retrieve a specific resource's data
-    instance = get_instance_details(project_id, zone, instance_name)
-    print(instance)  # Checking if the get_instance_details function works
+    # # Part 1: Retrieve a specific resource's data
+    # instance = get_instance_details(zone, instance_name)
+    # print(instance)  # Checking if the get_instance_details function works
 
-    # Exit for now
-    print('Exiting.')
-    exit(0)
+    # # Part 2: List all resources in a project
+    # instances = list_instances(zone)
+    # for instance in instances:
+    #     print(instance.name)  # Checking if the list_instances function works
+    #     details = get_instance_details(zone, instance.name)
+    #     print(details)
 
-    # Part 2: List all resources in a project
-    instances = list_instances(project_id, zone)
-    for instance in instances:
-        print(instance.name)  # Checking if the list_instances function works
-        details = get_instance_details(project_id, zone, instance.name)
-        print(details)
+    # # Exit for now
+    # print('Exiting.')
+    # exit(0)

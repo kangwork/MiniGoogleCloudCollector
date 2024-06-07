@@ -20,8 +20,8 @@ from utils.logging import Logger, setup_logger
 # 5. Main function
 ###
 
+# ==========================================================================
 ### 1. A function to return route messages
-
 def get_route_messages(default_project_id: str) -> str:
     return f"""
 
@@ -35,7 +35,8 @@ def get_route_messages(default_project_id: str) -> str:
 
 # =============================================================================
 ### 2. Helper functions to get role objects
-# A function to get a role's details
+
+# 2-1. A function to get a role's details
 def _get_role(role_id: int, logger: Logger) -> dict:
     """
     Get a role's details
@@ -57,7 +58,7 @@ def _get_role(role_id: int, logger: Logger) -> dict:
         return None
 
 
-# A function to get all roles in a project
+# 2-2. A function to get all roles in a project
 def _get_all_roles(logger: Logger) -> list:
     """
     Get all roles in a project
@@ -81,7 +82,8 @@ def _get_all_roles(logger: Logger) -> list:
 
 # ==========================================================================
 ### 3. Helper functions to stringify given role objects
-# A function to print a role's details
+
+# 3-1. A function to print a role's details
 def _stringify_role(role: dict, index: int = None, total: int = None) -> str:
     """
     Print a role's details
@@ -102,7 +104,7 @@ def _stringify_role(role: dict, index: int = None, total: int = None) -> str:
     return message
 
 
-# A function to print a list of roles
+# 3-2. A function to print a list of roles
 def _stringify_roles(roles: list) -> str:
     """
     Print all roles in a project
@@ -117,7 +119,9 @@ def _stringify_roles(roles: list) -> str:
 
 # ==========================================================================
 ### 4. Wrapper functions to get and print role(s) in a project, using the helper functions
-def print_role(role_id: int, logger: Logger) -> str | None:
+
+# 4-1. A function to print a role's details
+def print_role(role_id: int, logger: Logger) -> str:
     """
     Print a role's details
     
@@ -128,7 +132,9 @@ def print_role(role_id: int, logger: Logger) -> str | None:
     # logger.add_info(message)
     return message
 
-def print_all_roles(logger: Logger) -> str | None:
+
+# 4-2. A function to print all roles in a project
+def print_all_roles(logger: Logger) -> str:
     """
     Print all roles in a project
 
@@ -144,26 +150,9 @@ def print_all_roles(logger: Logger) -> str | None:
 # ==========================================================================
 # 5. Main function
 if __name__ == "__main__":
-    # 1.Setup the logger
-    logger = setup_logger()
-
-    # 2. Define the project ID
-    project_id = "bluese-cloudone-20200113"
-
-    # Part 1: List all resources in a project
-    print_all_roles(project_id, logger)  # Checking if the print_all_roles function works
-
-    
-    # Part 2: Retrieve a specific resource's data
-    role_title1 = "mini-collector-resource-viewer"
-    role_id1 = 609
-
-    role_title2 = "mini-collector-iam-viewer"
-    role_id2 = 261
-
-    print_role(project_id=project_id, role_id=role_id1, logger=logger)  # Checking if the print_role function works
-
-    
+    logger = Logger()
+    setup_logger(logger, to_file=False)
+    logger.add_info("This app cannot be run directly. Please run the main.py file.")
     logger.add_info("Exiting.")
     exit()
 
