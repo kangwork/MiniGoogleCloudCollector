@@ -1,5 +1,5 @@
 from google.cloud import compute_v1
-from ..utils.credentials import get_credentials
+from utils.credentials import get_credentials
 from fastapi.exceptions import HTTPException
 
 # A function to return route messages

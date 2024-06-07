@@ -2,9 +2,9 @@ import os
 from fastapi import FastAPI
 import uvicorn
 from google.cloud import storage
-from .utils.credentials import get_credentials
+from utils.credentials import get_credentials
 from fastapi.exceptions import HTTPException
-from .utils.logging import Logger, setup_logger
+from utils.logging import Logger, setup_logger
 from resources import storage_buckets, iam_roles, vm_instances
 from fastapi.responses import JSONResponse
 
@@ -115,22 +115,22 @@ def get_vm_instance(zone: str, instance_name: str, project_id: str = default_pro
 # 3. Run the app
 if __name__ == '__main__':
     # This logger refers to the global logger
-    # TODO
+    setup_logger(logger)
 
     # Manual Deployment
     message = """
     Manual Deployment:
-    - The command `uvicorn get_storage_buckets:app --reload` will run the app.
+    - The command `uvicorn main:app --reload` will be executed.
     - You can visit http://localhost:8000 to check the app.
     - Press Ctrl+C to stop the app.
     """
     logger.add_info(message)
 
-    # On the terminal, run the command: `uvicorn get_storage_buckets:app --reload`
+    # On the terminal, run the command: `uvicorn main:app --reload`
     # Execute it in the terminal to run the app, while not CTRL+C to stop it.
     # The app will be available at http://localhost:8000
 
-    os.system("uvicorn get_storage_buckets:app --reload")
+    os.system("uvicorn main:app --reload")
 
 
     # TODO: This part of the code still needs to be fixed. There's an issue with fastAPI module imports.

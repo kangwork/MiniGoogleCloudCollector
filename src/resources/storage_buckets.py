@@ -2,9 +2,9 @@ import os
 from fastapi import FastAPI
 import uvicorn
 from google.cloud import storage
-from ..utils.credentials import get_credentials
+from utils.credentials import get_credentials
 from fastapi.exceptions import HTTPException
-from ..utils.logging import Logger, setup_logger
+from utils.logging import Logger, setup_logger
 
 
 # 1. Create a FastAPI app
