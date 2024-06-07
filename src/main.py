@@ -98,9 +98,7 @@ def get_vm_instance(zone: str, instance_name: str):
 
 # 3. Run the app
 if __name__ == '__main__':
-
-
-    # This logger refers to the global logger
+    # Ask the user if they want to log the output in a file
     print("Do you want to log the output in a file? (y/n):")
     choice = input()
     if choice.lower() == 'y':
@@ -111,31 +109,11 @@ if __name__ == '__main__':
     else:
         logger = setup_logger(False)
 
-    # Manual Deployment
     message = """
-    Manual Deployment:
-    - The command `uvicorn main:app --reload` will be executed.
+    The Mini Google Cloud Collector is running!
+    - The command `uvicorn main:app --reload` will be executed by the script.
     - You can visit http://localhost:8000 to check the app.
     - Press Ctrl+C to stop the app.
     """
     logger.add_info(message)
-
-    # On the terminal, run the command: `uvicorn main:app --reload`
-    # Execute it in the terminal to run the app, while not CTRL+C to stop it.
-    # The app will be available at http://localhost:8000
-
     os.system("uvicorn main:app --reload")
-
-
-    # TODO: This part of the code still needs to be fixed. There's an issue with fastAPI module imports.
-    # print("\nAutomatic Deployment:")
-    # print("Do you want to run the app now? (y/n): ")
-    # choice = input()
-    # if choice == 'y':
-    # OPTION 1:
-    #     uvicorn.run(app, host="localhost", port=8000)
-    # OPTION 2:
-    #     exec_command = "uvicorn get_storage_buckets:app --reload"
-    #     os.system(exec_command)
-    # else:
-    #     print("Exiting...")
