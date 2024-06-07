@@ -20,7 +20,7 @@ from ..utils.logging import Logger, setup_logger
 # 5. Main function
 ###
 
-### 1. 
+### 1. A function to return route messages
 
 def get_route_messages(default_project_id: str) -> str:
     return f"""
@@ -34,7 +34,7 @@ def get_route_messages(default_project_id: str) -> str:
         """
 
 # =============================================================================
-### 1. Helper functions to get role objects
+### 2. Helper functions to get role objects
 # A function to get a role's details
 def _get_role(project_id: str, role_id: int, logger: Logger) -> dict:
     """
@@ -79,7 +79,7 @@ def _get_all_roles(project_id: str, logger: Logger) -> list:
 
 
 # ==========================================================================
-### 2. Helper functions to stringify given role objects
+### 3. Helper functions to stringify given role objects
 # A function to print a role's details
 def _stringify_role(role: dict, index: int = None, total: int = None) -> str:
     """
@@ -115,7 +115,7 @@ def _stringify_roles(roles: list) -> str:
 
 
 # ==========================================================================
-### 3. Wrapper functions to get and print role(s) in a project, using the helper functions
+### 4. Wrapper functions to get and print role(s) in a project, using the helper functions
 def print_role(project_id: str, role_id: int, logger: Logger) -> str | None:
     """
     Print a role's details
@@ -142,7 +142,7 @@ def print_all_roles(project_id: str, logger: Logger) -> str | None:
 
 
 # ==========================================================================
-# Main function
+# 5. Main function
 if __name__ == "__main__":
     # 1.Setup the logger
     logger = setup_logger()
