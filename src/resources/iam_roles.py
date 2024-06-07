@@ -134,7 +134,7 @@ def print_all_roles(project_id: str, logger: Logger) -> str | None:
 
     :param project_id: str, the project ID
     """
-    roles = _get_all_roles(project_id)
+    roles = _get_all_roles(project_id, logger)
     logger.add_info("Printing all roles in the project.")
     message = _stringify_roles(roles)
     logger.add_info(message)

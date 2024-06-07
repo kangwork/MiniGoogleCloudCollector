@@ -50,19 +50,15 @@ class Logger:
         self._logger.critical(message)
 
 
-def setup_logger(logger: Logger) -> Logger:
+def setup_logger(logger: Logger, to_file: bool) -> Logger:
     """
     Ask a user if they want to log the output in a file or on the console
     """
-    print("Do you want to log the output in a file? (y/n):")
-    choice = input()
-    if choice == 'y':
+    if to_file:
         logger.set_file_handler("log.log")
 
-        # Clear the log file (Overwrite)
-        with open("log.log", "w") as f:
-            f.write("")
     else:
         logger.set_stream_handler()
+        
     logger.add_info("Starting the program.")
     return logger
