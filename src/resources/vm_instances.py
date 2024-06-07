@@ -1,8 +1,21 @@
 from google.cloud import compute_v1
 from ..utils.credentials import get_credentials
+from fastapi.exceptions import HTTPException
+
+# A function to return route messages
+def get_route_messages(default_project_id: str) -> str:
+    return f"""
+    
+        Visit /vm/instances to list all VM instances in your project. 
+        (Example: /vm/instances?project_id={default_project_id})
+        
+        Visit /vm/instances/ZONE/INSTANCE_NAME to get details of a specific VM instance.
+        (Example: /vm/instances/us-west1-b/mini-collector-instance?project_id={default_project_id})
+        
+        """
 
 # A function to list all instances in a project
-def list_instances(project_id: str, zone: str):
+def list_instances(project_id: str, zone: str) -> dict:
     """
     List all instances in a project
 
@@ -12,12 +25,15 @@ def list_instances(project_id: str, zone: str):
     :return: list of instances
     """
     credentials = get_credentials()
-    instance_client = compute_v1.InstancesClient(credentials=credentials)
-    request = compute_v1.ListInstancesRequest(project=project_id, zone=zone)
-    return instance_client.list(request=request)
+    try:
+        instance_client = compute_v1.InstancesClient(credentials=credentials)
+        request = compute_v1.ListInstancesRequest(project=project_id, zone=zone)
+        return {"instances": instance_client.list(request=request)}
+    except Exception as e:
+        return HTTPException(status_code=500, detail=f"Failed to retrieve buckets: {str(e)}")
 
 # A function to get details of a specific instance
-def get_instance_details(project_id: str, zone, instance_name):
+def get_instance_details(project_id: str, zone, instance_name) -> dict:
     """
     Get details of a specific instance
 
@@ -28,12 +44,17 @@ def get_instance_details(project_id: str, zone, instance_name):
     :return: instance details
     """
     credentials = get_credentials()
-    instance_client = compute_v1.InstancesClient(credentials=credentials)
-    request = compute_v1.GetInstanceRequest(project=project_id, zone=zone, instance=instance_name)
-    return instance_client.get(request=request)
+    try:
+        instance_client = compute_v1.InstancesClient(credentials=credentials)
+        request = compute_v1.GetInstanceRequest(project=project_id, zone=zone, instance=instance_name)
+        return instance_client.get(request=request)
+    except Exception as e:
+        return HTTPException(status_code=500, detail=f"Failed to retrieve buckets: {str(e)}")
 
 
 if __name__ == '__main__':
+
+    # Example use
     project_id = "bluese-cloudone-20200113"
     zone = "us-west1-b"
     instance_name = "mini-collector-instance"
@@ -43,8 +64,8 @@ if __name__ == '__main__':
     print(instance)  # Checking if the get_instance_details function works
 
     # Exit for now
-    print('Exiting...')
-    exit()
+    print('Exiting.')
+    exit(0)
 
     # Part 2: List all resources in a project
     instances = list_instances(project_id, zone)

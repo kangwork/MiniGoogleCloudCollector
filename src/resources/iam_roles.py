@@ -2,22 +2,36 @@ from google.cloud import iam_admin_v1 as iam
 from ..utils.credentials import get_credentials
 from ..utils.logging import Logger, setup_logger
 
-### This module is divided into 4 categories of functions:
-# 1. Helper functions to get role objects
+### This module is divided into 5 categories of functions:
+# 1. A function to return route messages (used in the ../main.py)
+#    - get_route_messages(default_project_id: str) -> str
+# 2. Helper functions to get role objects
 #     - _get_role(project_id: str, role_id: int) -> dict
 #     - _get_all_roles(project_id: str) -> list
 #
-# 2. Helper functions to print given role objects
-#     - _print_role(role: dict) -> None
-#     - _print_roles(roles: list) -> None
+# 3. Helper functions to stringify given role objects
+#     - _stringify_role(role: dict, index: int = None, total: int = None) -> str
+#     - _stringify_roles(roles: list) -> str
 #
-# 3. Wrapper functions to get and print role(s) in a project, using the helper functions
-#     - print_role(project_id: str, role_id: int) -> None
-#     - print_all_roles(project_id: str) -> None
+# 4. Wrapper functions to get and print role(s) in a project, using the helper functions
+#     - print_role(project_id: str, role_id: int) -> str | None
+#     - print_all_roles(project_id: str) -> str | None
 #
-# 4. Main function
+# 5. Main function
 ###
 
+### 1. 
+
+def get_route_messages(default_project_id: str) -> str:
+    return f"""
+
+        Visit /iam/roles to list all IAM roles in your project. 
+        (Example: /iam/roles?project_id={default_project_id})
+
+        Visit /iam/roles/ROLE_ID to get details of a specific IAM role.
+        (Example: /iam/roles/609?project_id={default_project_id})
+        
+        """
 
 # =============================================================================
 ### 1. Helper functions to get role objects
