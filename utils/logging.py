@@ -9,7 +9,7 @@ class Logger:
     ----------------
     - _logger: logging.Logger, the logger object
     - _file_handler: logging.FileHandler, the file handler
-    # - _stream_handler: logging.StreamHandler, the stream handler
+    - _stream_handler: logging.StreamHandler, the stream handler
     - _formatter: logging.Formatter, the formatter
     - _log_file: str, the log file path
     """
@@ -30,13 +30,6 @@ class Logger:
             self._stream_handler.setFormatter(self._formatter)
             self._logger.addHandler(self._stream_handler)
         return
-
-
-    def add_log(self, message: str):
-        """
-        Add a log message to the log, but do not format it(do not use any formatter).
-        """
-        self._logger.log(logging.INFO, message)
 
     def add_info(self, message: str):
         self._logger.info(message)
@@ -69,4 +62,3 @@ def setup_logger() -> Logger:
         logger = Logger()
     logger.add_info("Starting the program.")
     return logger
-    
