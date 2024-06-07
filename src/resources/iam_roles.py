@@ -36,15 +36,15 @@ def get_route_messages(default_project_id: str) -> str:
 # =============================================================================
 ### 2. Helper functions to get role objects
 # A function to get a role's details
-def _get_role(project_id: str, role_id: int, logger: Logger) -> dict:
+def _get_role(role_id: int, logger: Logger) -> dict:
     """
     Get a role's details
     
-    :param project_id: str, the project ID
     :param role_id, int, the role ID
     
     :return: dict, the role's details"""
     credentials = get_credentials()
+    project_id = credentials.project_id
     role_name = f'projects/{project_id}/roles/{str(role_id)}'
     logger.add_info(f"Getting role: {role_name}")
     try:
@@ -58,7 +58,7 @@ def _get_role(project_id: str, role_id: int, logger: Logger) -> dict:
 
 
 # A function to get all roles in a project
-def _get_all_roles(project_id: str, logger: Logger) -> list:
+def _get_all_roles(logger: Logger) -> list:
     """
     Get all roles in a project
     
@@ -67,6 +67,7 @@ def _get_all_roles(project_id: str, logger: Logger) -> list:
     :return: list, all roles in the project
     """
     credentials = get_credentials()
+    project_id = credentials.project_id
     logger.add_info("Getting all roles in the project.")
     try:
         client = iam.IAMClient(credentials=credentials)
@@ -116,28 +117,27 @@ def _stringify_roles(roles: list) -> str:
 
 # ==========================================================================
 ### 4. Wrapper functions to get and print role(s) in a project, using the helper functions
-def print_role(project_id: str, role_id: int, logger: Logger) -> str | None:
+def print_role(role_id: int, logger: Logger) -> str | None:
     """
     Print a role's details
     
-    :param project_id: str, the project ID
     :param role_id, int, the role ID
     """
-    role = _get_role(project_id, role_id, logger)
+    role = _get_role(role_id, logger)
     message = _stringify_role(role)
-    logger.add_info(message)
+    # logger.add_info(message)
     return message
 
-def print_all_roles(project_id: str, logger: Logger) -> str | None:
+def print_all_roles(logger: Logger) -> str | None:
     """
     Print all roles in a project
 
     :param project_id: str, the project ID
     """
-    roles = _get_all_roles(project_id, logger)
+    roles = _get_all_roles(logger)
     logger.add_info("Printing all roles in the project.")
     message = _stringify_roles(roles)
-    logger.add_info(message)
+    # logger.add_info(message)
     return message
 
 

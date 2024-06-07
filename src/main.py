@@ -46,18 +46,19 @@ def read_root(request: Request):
 
 
 ### 2-2. Storage Bucket APIs
+# Example use: http://localhost/storage/buckets/airbyte_testing_001?project_id=bluese-cloudone-20200113
 # 2-2-1. A route to list all storage buckets in a project
 @app.get("/storage/buckets")
-def list_storage_buckets(project_id: str = default_project_id):
-    message = storage_buckets.list_storage_buckets(project_id)
+def list_storage_buckets():
+    message = storage_buckets.list_storage_buckets()
     return {"buckets": message}
 
 
 # Example use: http://localhost/storage/buckets/airbyte_testing_001?project_id=bluese-cloudone-20200113
 # 2-2-2. A route to get a storage bucket's details
 @app.get("/storage/buckets/{bucket_name}")
-def get_storage_bucket(bucket_name: str, project_id: str = default_project_id):
-    message = storage_buckets.get_storage_bucket(bucket_name, project_id)
+def get_storage_bucket(bucket_name: str):
+    message = storage_buckets.get_storage_bucket(bucket_name)
     return {"bucket": message}
 
 
@@ -65,8 +66,8 @@ def get_storage_bucket(bucket_name: str, project_id: str = default_project_id):
 # 2-3-1. A route to list all IAM roles in a project
 # Example use: http://localhost/iam/roles?project_id=bluese-cloudone-20200113
 @app.get("/iam/roles")
-def list_iam_roles(project_id: str = default_project_id):
-    message = iam_roles.print_all_roles(project_id, logger)
+def list_iam_roles():
+    message = iam_roles.print_all_roles(logger)
     return {"roles": message}
 
 
@@ -74,8 +75,8 @@ def list_iam_roles(project_id: str = default_project_id):
 # Example use: http://localhost/iam/roles/261
 # 2-3-2. A route to get details of a specific IAM role
 @app.get("/iam/roles/{role_id}")
-def get_iam_role(role_id: int, project_id: str = default_project_id):
-    message = iam_roles.print_role(project_id, role_id, logger)
+def get_iam_role(role_id: int):
+    message = iam_roles.print_role(role_id, logger)
     return {"role": message}
 
 
@@ -91,7 +92,7 @@ def list_vm_instances(project_id: str = default_project_id):
 # Example use: http://localhost/vm/instances/us-west1-b/mini-collector-instance?project_id=bluese-cloudone-20200113
 # 2-4-2. A route to get details of a specific VM instance
 @app.get("/vm/instances/{zone}/{instance_name}")
-def get_vm_instance(zone: str, instance_name: str, project_id: str = default_project_id):
+def get_vm_instance(zone: str, instance_name: str):
     message = vm_instances.get_instance_details(project_id, zone, instance_name)
     return {"instance": message}
 
