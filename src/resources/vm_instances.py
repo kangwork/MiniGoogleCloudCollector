@@ -8,7 +8,7 @@ def get_route_messages(default_project_id: str) -> str:
     return f"""
     
         Visit /vm/instances to list all VM instances in your project. Include zone as a query parameter.
-        (Example: /vm/instances?zone=us-west1-b)
+        (Example: /vm/instances/us-west1-b)
         
         Visit /vm/instances/ZONE/INSTANCE_NAME to get details of a specific VM instance.
         (Example: /vm/instances/us-west1-b/mini-collector-instance)

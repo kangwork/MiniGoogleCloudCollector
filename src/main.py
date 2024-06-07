@@ -77,7 +77,7 @@ def get_iam_role(role_id: int):
 
 ### 2-4. VM Instances APIs
 # 2-4-1. A route to list all VM instances in a project
-# Example use: http://localhost/vm/instances
+# Example use: http://localhost/vm/instances/us-west1-b
 @app.get("/vm/instances")
 def list_vm_instances():
     message = vm_instances.list_instances()
