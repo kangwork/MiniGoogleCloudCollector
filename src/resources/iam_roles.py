@@ -54,10 +54,10 @@ def get_route_messages(default_project_id: str) -> str:
     return f"""
 
         Visit /iam/roles to list all IAM roles in your project. 
-        (Example: /iam/roles?project_id={default_project_id})
+        (Example: /iam/roles)
 
         Visit /iam/roles/ROLE_ID to get details of a specific IAM role.
-        (Example: /iam/roles/609?project_id={default_project_id})
+        (Example: /iam/roles/609)
         
         """
 
