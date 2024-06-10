@@ -4,11 +4,14 @@ import uvicorn
 from google.cloud import storage
 from utils.credentials import get_credentials
 from fastapi.exceptions import HTTPException
-from utils.logging import Logger, setup_logger
+from utils.logging import Logger, get_sub_file_logger, get_console_logger
+from utils.resource import Resource
+from google.cloud.storage.bucket import Bucket
 
+logger = get_sub_file_logger(__name__)
 
 # 0. A class to represent a Storage Bucket
-class StorageBucket:
+class StorageBucket(Resource):
     """
     A class to represent a Storage Bucket
 
@@ -20,7 +23,8 @@ class StorageBucket:
     - labels: dict, the bucket labels
     - created: datetime, the bucket creation time
     """
-    def __init__(self, bucket: dict):
+    def __init__(self, bucket: Bucket):
+        super().__init__(bucket.__dict__)
         self.name = bucket.name
         self.location = bucket.location
         self.storage_class = bucket.storage_class
@@ -86,8 +90,7 @@ def collect_resource(bucket_name: str) -> StorageBucket:
 # =============================================================================
 # 3. Main function
 if __name__ == '__main__':
-    logger = Logger()
-    setup_logger(logger, to_file=False)
-    logger.add_info("This app cannot be run directly. Please run the main.py file.")
+    logger = get_console_logger()
+    logger.add_warning("This app cannot be run directly. Please run the main.py file.")
     logger.add_info("Exiting.")
     exit(0)

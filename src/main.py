@@ -48,7 +48,7 @@ def read_root(request: Request):
 def list_storage_buckets():
     resources = storage_buckets.collect_resources() 
     simplified_resources = [str(resource) for resource in resources]
-    return {"data": simplified_resources, "length": len(message), "message": "List of all storage buckets in the project."}
+    return {"data": simplified_resources, "length": len(resources), "message": "List of all storage buckets in the project."}
 
 
 # Example use: http://localhost/storage/buckets/airbyte_testing_001
@@ -56,7 +56,7 @@ def list_storage_buckets():
 @app.get("/storage/buckets/{bucket_name}")
 def get_storage_bucket(bucket_name: str):
     resource = storage_buckets.collect_resource(bucket_name) 
-    return {"data": resource, "message": "Details of the specific storage bucket."}
+    return {"data": resource.__repr__(), "message": "Details of the specific storage bucket."}
 
 
 ### 2-3. IAM Roles APIs
@@ -64,7 +64,7 @@ def get_storage_bucket(bucket_name: str):
 # Example use: http://localhost/iam/roles
 @app.get("/iam/roles")
 def list_iam_roles():
-    resources = iam_roles.collect_resources(logger)
+    resources = iam_roles.collect_resources()
     simplified_resources = [str(resource) for resource in resources]
     return {"data": simplified_resources, "length": len(resources), "message": "List of all IAM roles in the project."}
 
@@ -74,37 +74,46 @@ def list_iam_roles():
 # 2-3-2. A route to get details of a specific IAM role
 @app.get("/iam/roles/{role_id}")
 def get_iam_role(role_id: int):
-    resource = iam_roles.collect_resource(role_id, logger)
+    resource = iam_roles.collect_resource(role_id)
+
     if resource is None:
-        print("NONEEEEE")
         response = JSONResponse(content={"data": "", "message": "Failed to retrieve the IAM role."}, status_code=500)
     else:
-        exit(0)
-        response = JSONResponse(content={"data": resource.to_dict(), "message": "Details of the specific IAM role."}, status_code=200)
+        response = JSONResponse(content={"data": resource.__repr__(), "message": "Details of the specific IAM role."}, status_code=200)
 
     return response
-    # return {"data": resource, "message": "Details of the specific IAM role."}
 
 
 ### 2-4. VM Instances APIs
 # 2-4-1. A route to list all VM instances in a project
 # Example use: http://localhost/vm/instances/us-west1-b
-@app.get("/vm/instances/{zone}")
+@app.get("/vm/instances")
 def list_vm_instances():
-    resources = vm_instances.collect_resources() 
+    resources = vm_instances.collect_resources()
+    if isinstance(resources, HTTPException):
+        raise resources
     simplified_resources = [str(resource) for resource in resources]
     return {"data": simplified_resources, "length": len(resources), "message": "List of all VM instances in the project."}
 
 
+# 2-4-2. A route to list all VM instances in a project in a specific zone
+# Example use: http://localhost/vm/instances/us-west1-b
+@app.get("/vm/instances/{zone}")
+def list_vm_instances_in_zone(zone: str):
+    resources = vm_instances.collect_resources_in_zone(zone)
+    if isinstance(resources, HTTPException):
+        raise resources
+    simplified_resources = [str(resource) for resource in resources]
+    return {"data": simplified_resources, "length": len(resources), "message": f"List of all VM instances in the project in {zone}."}
+
+
+
 # Example use: http://localhost/vm/instances/us-west1-b/mini-collector-instance
-# 2-4-2. A route to get details of a specific VM instance
+# 2-4-3. A route to get details of a specific VM instance
 @app.get("/vm/instances/{zone}/{instance_name}")
 def get_vm_instance(zone: str, instance_name: str):
     resource = vm_instances.collect_resource(zone, instance_name)
-    # json converter
-    dictionary = resource.to_dict()
-    return json.dumps({"data": dictionary, "message": "Details of the specific VM instance."}, indent=4, sort_keys=True)
-    return {"data": resource.to_dict(), "message": "Details of the specific VM instance."}
+    return {"data": resource.__repr__(), "message": "Details of the specific VM instance."}
 
 
 # =============================================================================

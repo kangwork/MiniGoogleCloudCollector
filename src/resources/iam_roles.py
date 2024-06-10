@@ -1,6 +1,8 @@
 from google.cloud import iam_admin_v1 as iam
 from utils.credentials import get_credentials
-from utils.logging import Logger, setup_logger
+from utils.logging import Logger, get_sub_file_logger, get_console_logger
+from utils.resource import Resource
+
 
 ### This module is divided into 5 categories of functions:
 # 0. A class to represent a Role
@@ -22,9 +24,11 @@ from utils.logging import Logger, setup_logger
 # 5. Main function
 ###
 
+logger = get_sub_file_logger(__name__)
+
 # ==========================================================================
 # 0. A class to represent a Role
-class Role:
+class Role(Resource):
     """
     A class to represent a Role
 
@@ -36,6 +40,7 @@ class Role:
     - included_permissions: list, the role's included permissions
     """
     def __init__(self, role: dict):
+        super().__init__(role)
         self.name = role.name
         self.title = role.title
         self.description = role.description
@@ -65,7 +70,7 @@ def get_route_messages(default_project_id: str) -> str:
 ### 2. Helper functions to get role objects
 
 # 2-1. A function to get a role's details
-def collect_resource(role_id: int, logger: Logger) -> Role:
+def collect_resource(role_id: int) -> Role:
     """
     Get a role's details
     
@@ -81,12 +86,12 @@ def collect_resource(role_id: int, logger: Logger) -> Role:
         response = client.get_role(request=request)
         return Role(response)
     except Exception as e:
-        logger.add_error(f"[{__name__}] Failed to get role: {str(e)}")
+        logger.add_error(f"Failed to get role: {str(e)}")
         return None
 
 
 # 2-2. A function to get all roles in a project
-def collect_resources(logger: Logger) -> list[Role]:
+def collect_resources() -> list[Role]:
     """
     Get all roles in a project
     
@@ -103,7 +108,7 @@ def collect_resources(logger: Logger) -> list[Role]:
         roles = [Role(role) for role in response.roles]
         return roles
     except Exception as e:
-        logger.add_error(f"[{__name__}] Failed to get all roles: {str(e)}")
+        logger.add_error(f"Failed to get all roles: {str(e)}")
         return None
 
 
@@ -116,9 +121,8 @@ def collect_resources(logger: Logger) -> list[Role]:
 # ==========================================================================
 # 5. Main function
 if __name__ == "__main__":
-    logger = Logger()
-    setup_logger(logger, to_file=False)
-    logger.add_info("This app cannot be run directly. Please run the main.py file.")
+    logger = get_console_logger()
+    logger.add_warning("This app cannot be run directly. Please run the main.py file.")
     logger.add_info("Exiting.")
     exit()
 
