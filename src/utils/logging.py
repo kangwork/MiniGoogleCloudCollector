@@ -60,8 +60,8 @@ def setup_logger(logger: Logger, to_file: bool) -> None:
     else:
         logger.set_stream_handler()
         
-    logger.add_info("Starting the program.")
     return 
+
 
 def setup_main_file_logger(logger: Logger) -> None:
     """
@@ -71,7 +71,9 @@ def setup_main_file_logger(logger: Logger) -> None:
     with open("log.log", "w") as f:
         f.write("")
     setup_logger(logger, to_file=True)
+    logger.add_info("Starting the main program.")
     return
+
 
 def get_sub_file_logger(module_name: str = __name__) -> Logger:
     """
@@ -81,6 +83,7 @@ def get_sub_file_logger(module_name: str = __name__) -> Logger:
     # DO NOT clear the log file, but append to it
     setup_logger(logger, to_file=True)
     return logger
+
 
 def get_console_logger(module_name: str = __name__) -> Logger:
     """

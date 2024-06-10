@@ -4,7 +4,7 @@ import uvicorn
 from google.cloud import storage
 from utils.credentials import get_credentials
 from fastapi.exceptions import HTTPException
-from utils.logging import Logger, get_sub_file_logger, get_console_logger
+from utils.logging import get_console_logger, get_sub_file_logger
 from utils.resource import Resource
 from google.cloud.storage.bucket import Bucket
 
@@ -58,7 +58,7 @@ def get_route_messages(default_project_id: str) -> str:
 # 2. Helper functions to get storage bucket objects
 
 # 2-1. A function to get storage bucket objects
-def collect_resources() -> list[StorageBucket]:
+def collect_resources() -> list[StorageBucket] | int:
     credentials = get_credentials()
     project_id = credentials.project_id
 
@@ -70,11 +70,11 @@ def collect_resources() -> list[StorageBucket]:
         return buckets
     
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"[{__name__}] Failed to retrieve buckets: {str(e)}")
-
+        logger.add_error(f"collect_resources(): {str(e)}")
+        return e.code
 
 # 2-2. A function to get a storage bucket's details
-def collect_resource(bucket_name: str) -> StorageBucket:
+def collect_resource(bucket_name: str) -> StorageBucket | int:
     credentials = get_credentials()
     project_id = credentials.project_id
 
@@ -84,7 +84,8 @@ def collect_resource(bucket_name: str) -> StorageBucket:
         return bucket
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"[{__name__}] Failed to retrieve bucket details: {str(e)}")
+        logger.add_error(f"collect_resource(bucket_name={bucket_name}): {str(e)}")
+        return e.code
 
 
 # =============================================================================

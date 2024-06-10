@@ -1,6 +1,6 @@
 from google.cloud import iam_admin_v1 as iam
 from utils.credentials import get_credentials
-from utils.logging import Logger, get_sub_file_logger, get_console_logger
+from utils.logging import get_console_logger, get_sub_file_logger
 from utils.resource import Resource
 
 
@@ -70,7 +70,7 @@ def get_route_messages(default_project_id: str) -> str:
 ### 2. Helper functions to get role objects
 
 # 2-1. A function to get a role's details
-def collect_resource(role_id: int) -> Role:
+def collect_resource(role_id: int) -> Role | int:
     """
     Get a role's details
     
@@ -86,12 +86,12 @@ def collect_resource(role_id: int) -> Role:
         response = client.get_role(request=request)
         return Role(response)
     except Exception as e:
-        logger.add_error(f"Failed to get role: {str(e)}")
-        return None
+        logger.add_error(f"collect_resource(role_id={role_id}): {str(e)}")
+        return e.code
 
 
 # 2-2. A function to get all roles in a project
-def collect_resources() -> list[Role]:
+def collect_resources() -> list[Role] | int:
     """
     Get all roles in a project
     
@@ -108,8 +108,8 @@ def collect_resources() -> list[Role]:
         roles = [Role(role) for role in response.roles]
         return roles
     except Exception as e:
-        logger.add_error(f"Failed to get all roles: {str(e)}")
-        return None
+        logger.add_error(f"collect_resources(): {str(e)}")
+        return e.code
 
 
 # ==========================================================================

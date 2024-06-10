@@ -1,7 +1,7 @@
 from google.cloud import compute_v1
 from utils.credentials import get_credentials
 from fastapi.exceptions import HTTPException
-from utils.logging import Logger, setup_logger, get_sub_file_logger
+from utils.logging import get_console_logger, get_sub_file_logger
 from utils.resource import Resource
 
 logger = get_sub_file_logger(__name__)
@@ -38,6 +38,7 @@ class VMInstance(Resource):
         """
         return f"Zone: {self.zone}, Name: {self.name}"
 
+
 # 1. A function to return route messages
 def get_route_messages(default_project_id: str) -> str:
     return f"""
@@ -54,9 +55,8 @@ def get_route_messages(default_project_id: str) -> str:
 
 # =============================================================================
 # 2. Helper functions to get instance objects (VM Instances)
-
 # 2-1. A function to list all instances in a project
-def collect_resources() -> list[VMInstance]:
+def collect_resources() -> list[VMInstance] | int:
     """
     List all instances in a project
 
@@ -83,12 +83,12 @@ def collect_resources() -> list[VMInstance]:
             # instances.extend(instances_in_zone)
         return instances
     except Exception as e:
-        logger.add_error(f"Failed to retrieve instances: {str(e)}")
-        return HTTPException(status_code=500, detail=f"Failed to retrieve instances: {str(e)}")
+        logger.add_error(f"collect_resources(): {str(e)}")
+        return e.code
 
 
 # 2-2. A function to get details of a specific instance
-def collect_resource(zone: str, instance_name: str) -> VMInstance:
+def collect_resource(zone: str, instance_name: str) -> VMInstance | int:
     """
     Get details of a specific instance
 
@@ -106,12 +106,12 @@ def collect_resource(zone: str, instance_name: str) -> VMInstance:
         request = compute_v1.GetInstanceRequest(project=project_id, zone=zone, instance=instance_name)
         return VMInstance(instance_client.get(request=request))
     except Exception as e:
-        logger.add_error(f"Failed to retrieve instances: {str(e)}")
-        return HTTPException(status_code=500, detail=f"Failed to retrieve instances: {str(e)}")
+        logger.add_error(f"collect_resource(zone={zone}, instance_name:{instance_name}): {str(e)}")
+        return e.code
     
 
 # 2-3. A function to list all instances in a project in a specific zone
-def collect_resources_in_zone(zone: str) -> list[VMInstance]:
+def collect_resources_in_zone(zone: str) -> list[VMInstance] | int:
     """
     List all instances in a project
 
@@ -131,15 +131,14 @@ def collect_resources_in_zone(zone: str) -> list[VMInstance]:
             instances.append(VMInstance(instance))
         return instances
     except Exception as e:
-        logger.add_error(f"Failed to retrieve instances: {str(e)}")
-        return HTTPException(status_code=500, detail=f"Failed to retrieve instances: {str(e)}")
+        logger.add_error(f"collect_resources_in_zone(zone={zone}): {str(e)}")
+        return e.code
 
 
 # =============================================================================
 # 3. Main function
 if __name__ == '__main__':
-    logger = Logger()
-    setup_logger(logger, to_file=False)
+    logger = get_console_logger()
     logger.add_warning("This app cannot be run directly. Please run the main.py file.")
     logger.add_info("Exiting.")
     exit(0)
