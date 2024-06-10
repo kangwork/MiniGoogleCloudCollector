@@ -50,7 +50,7 @@ class Logger:
         self._logger.critical(message)
 
 
-def setup_logger(logger: Logger, to_file: bool) -> Logger:
+def setup_logger(logger: Logger, to_file: bool) -> None:
     """
     Ask a user if they want to log the output in a file or on the console
     """
@@ -61,4 +61,4 @@ def setup_logger(logger: Logger, to_file: bool) -> Logger:
         logger.set_stream_handler()
         
     logger.add_info("Starting the program.")
-    return logger
+    return 

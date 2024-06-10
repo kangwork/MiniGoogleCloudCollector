@@ -101,13 +101,13 @@ if __name__ == '__main__':
     # Ask the user if they want to log the output in a file
     print("Do you want to log the output in a file? (y/n):")
     choice = input()
-    if choice.lower() == 'y':
+    if choice.lower() != 'n':
         # Clear the log file
         with open("log.log", "w") as f:
             f.write("")
         setup_logger(logger, to_file=True)
     else:
-        logger = setup_logger(False)
+        setup_logger(logger, False)
 
     message = """
     The Mini Google Cloud Collector is running!

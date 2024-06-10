@@ -1,14 +1,15 @@
 import os
 import json
 from google import oauth2
-from utils.logging import setup_logger
+from utils.logging import Logger, setup_logger
 
 # A function to get credentials.
 def get_credentials():
     credentials_path = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
 
     if not credentials_path:
-        logger = setup_logger()
+        logger = Logger()
+        setup_logger(logger, True)
         message = """GOOGLE_APPLICATION_CREDENTIALS environment variable is not set.\nPlease set the GOOGLE_APPLICATION_CREDENTIALS environment variable to the path of your credentials file.\nE.g. export GOOGLE_APPLICATION_CREDENTIALS='../local/mini-collector/key.json'"""
         logger.add_error(message)
         raise Exception("GOOGLE_APPLICATION_CREDENTIALS environment variable is not set.")
