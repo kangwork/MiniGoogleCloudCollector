@@ -4,11 +4,12 @@ import uvicorn
 from google.cloud import storage
 from utils.credentials import get_credentials
 from fastapi.exceptions import HTTPException
-from utils.logging import Logger, setup_logger
+from utils.logging import Logger, setup_logger, setup_main_file_logger
 from resources import storage_buckets, iam_roles, vm_instances
 from fastapi.responses import JSONResponse
 import json
 from fastapi.templating import Jinja2Templates
+import sys
 
 
 # A main program to call all the api functions
@@ -74,7 +75,15 @@ def list_iam_roles():
 @app.get("/iam/roles/{role_id}")
 def get_iam_role(role_id: int):
     resource = iam_roles.collect_resource(role_id, logger)
-    return {"data": resource, "message": "Details of the specific IAM role."}
+    if resource is None:
+        print("NONEEEEE")
+        response = JSONResponse(content={"data": "", "message": "Failed to retrieve the IAM role."}, status_code=500)
+    else:
+        exit(0)
+        response = JSONResponse(content={"data": resource.to_dict(), "message": "Details of the specific IAM role."}, status_code=200)
+
+    return response
+    # return {"data": resource, "message": "Details of the specific IAM role."}
 
 
 ### 2-4. VM Instances APIs
@@ -92,22 +101,26 @@ def list_vm_instances():
 @app.get("/vm/instances/{zone}/{instance_name}")
 def get_vm_instance(zone: str, instance_name: str):
     resource = vm_instances.collect_resource(zone, instance_name)
-    return {"data": resource, "message": "Details of the specific VM instance."}
+    # json converter
+    dictionary = resource.to_dict()
+    return json.dumps({"data": dictionary, "message": "Details of the specific VM instance."}, indent=4, sort_keys=True)
+    return {"data": resource.to_dict(), "message": "Details of the specific VM instance."}
 
 
 # =============================================================================
 # 3. Main function (Run the app)
 if __name__ == '__main__':
     # Ask the user if they want to log the output in a file
-    print("Do you want to log the output in a file? (y/n):")
-    choice = input()
-    if choice.lower() != 'n':
-        # Clear the log file
-        with open("log.log", "w") as f:
-            f.write("")
-        setup_logger(logger, to_file=True)
+    # If the first argument is not 'y', we will ask a user.
+    if len(sys.argv) > 1 and sys.argv[1].lower() == 'y':
+        setup_main_file_logger(logger)
     else:
-        setup_logger(logger, False)
+        print("Do you want to log the output in a file? (y/n):")
+        choice = input()
+        if choice.lower() != 'n':
+            setup_main_file_logger(logger)
+        else:
+            setup_logger(logger, False)
 
     message = """
     The Mini Google Cloud Collector is running!

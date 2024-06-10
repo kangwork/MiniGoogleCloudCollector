@@ -62,3 +62,13 @@ def setup_logger(logger: Logger, to_file: bool) -> None:
         
     logger.add_info("Starting the program.")
     return 
+
+def setup_main_file_logger(logger: Logger) -> None:
+    """
+    Set up the logger for the main file
+    """
+    # Clear the log file
+    with open("log.log", "w") as f:
+        f.write("")
+    setup_logger(logger, to_file=True)
+    return
