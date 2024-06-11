@@ -1,11 +1,11 @@
 from google.cloud import compute_v1
 from utils.credentials import get_credentials
-from utils.logging import get_console_logger, get_sub_file_logger
+from utils.logging import get_console_logger
 from utils.resource import Resource
+from utils.collector import Collector
 
-logger = get_sub_file_logger(__name__)
-
-# 0. A class to represent a VM Instance
+# ==========================================================================
+# Resource class
 class VMInstance(Resource):
     """
     A class to represent a VM Instance
@@ -20,22 +20,8 @@ class VMInstance(Resource):
     - network_interfaces: list, the instance network interfaces
     - metadata: dict, the instance metadata
     """
-    def __init__(self, resource: dict = None):
-        super().__init__()
-        self.name = None
-        self.zone = None
-        self.machine_type = None
-        self.status = None
-        self.creation_time = None
-        self.disks = None
-        self.network_interfaces = None
-        self.metadata = None
-        if resource:
-            self.set_resource(resource)
-    
-
-    def set_resource(self, resource: dict):
-        super().set_resource(resource)
+    def __init__(self, resource: dict):
+        super().__init__(resource)
         self.name = resource.name
         self.zone = resource.zone
         self.machine_type = resource.machine_type
@@ -53,7 +39,12 @@ class VMInstance(Resource):
         return f"Zone: {self.zone}, Name: {self.name}"
 
 
-    # 1. A function to return route messages
+# =============================================================================
+# Collector class
+class VMInstanceCollector(Collector):
+    def __init__(self):
+        super().__init__(__name__)
+
     def get_route_messages(self) -> str:
         return """
 
@@ -67,90 +58,79 @@ class VMInstance(Resource):
             
             """
 
-# =============================================================================
-# 2. Helper functions to get instance objects (VM Instances)
-# 2-1. A function to list all instances in a project
-def collect_resources() -> list[VMInstance] | int:
-    """
-    List all instances in a project
+    def collect_resources(self) -> list[VMInstance] | int:
+        """
+        List all instances in a project
 
-    :param project_id: str, the project ID
+        :param project_id: str, the project ID
 
-    :return: list of instances[VMInstance]
-    """
-    credentials = get_credentials()
-    project_id = credentials.project_id
+        :return: list of instances[VMInstance]
+        """
+        credentials = get_credentials()
+        project_id = credentials.project_id
 
-    try:
-        instance_client = compute_v1.InstancesClient(credentials=credentials)
-        instances = []
-        for (zone_info, instances_scoped_list) in instance_client.aggregated_list(project=project_id):
-            zone_instances, warning = instances_scoped_list.instances, instances_scoped_list.warning
-            if warning:
-                continue
-            else:
-                for instance in zone_instances:
-                    instances.append(VMInstance(instance))
-            # it's in form of 'zones/ZONENAME', so extract the ZONENAME
-            # zone_name = zone_info.split('/')[-1]
-            # instances_in_zone = collect_resources_in_zone(zone_name)
-            # instances.extend(instances_in_zone)
-        return instances
-    except Exception as e:
-        logger.add_error(f"collect_resources(): {str(e)}")
-        return e.code
+        try:
+            instance_client = compute_v1.InstancesClient(credentials=credentials)
+            instances = []
+            for (zone_info, instances_scoped_list) in instance_client.aggregated_list(project=project_id):
+                zone_instances, warning = instances_scoped_list.instances, instances_scoped_list.warning
+                if warning:
+                    continue
+                else:
+                    for instance in zone_instances:
+                        instances.append(VMInstance(instance))
+            return instances
+        except Exception as e:
+            self.logger.add_error(f"collect_resources(): {str(e)}")
+            return e.code
 
+    def collect_resource(self, zone: str, instance_name: str) -> VMInstance | int:
+        """
+        Get details of a specific instance
 
-# 2-2. A function to get details of a specific instance
-def collect_resource(zone: str, instance_name: str) -> VMInstance | int:
-    """
-    Get details of a specific instance
+        :param project_id: str, the project ID
+        :param zone: str, the zone
+        :param instance_name: str, the instance name
 
-    :param project_id: str, the project ID
-    :param zone: str, the zone
-    :param instance_name: str, the instance name
+        :return: instance details
+        """
+        credentials = get_credentials()
+        project_id = credentials.project_id
 
-    :return: instance details
-    """
-    credentials = get_credentials()
-    project_id = credentials.project_id
+        try:
+            instance_client = compute_v1.InstancesClient(credentials=credentials)
+            request = compute_v1.GetInstanceRequest(project=project_id, zone=zone, instance=instance_name)
+            return VMInstance(instance_client.get(request=request))
+        except Exception as e:
+            self.logger.add_error(f"collect_resource(zone={zone}, instance_name:{instance_name}): {str(e)}")
+            return e.code
+        
+    def collect_resources_in_zone(self, zone: str) -> list[VMInstance] | int:
+        """
+        List all instances in a project
 
-    try:
-        instance_client = compute_v1.InstancesClient(credentials=credentials)
-        request = compute_v1.GetInstanceRequest(project=project_id, zone=zone, instance=instance_name)
-        return VMInstance(instance_client.get(request=request))
-    except Exception as e:
-        logger.add_error(f"collect_resource(zone={zone}, instance_name:{instance_name}): {str(e)}")
-        return e.code
-    
+        :param project_id: str, the project ID
+        :param zone: str, the zone
 
-# 2-3. A function to list all instances in a project in a specific zone
-def collect_resources_in_zone(zone: str) -> list[VMInstance] | int:
-    """
-    List all instances in a project
+        :return: list of instances[VMInstance]
+        """
+        credentials = get_credentials()
+        project_id = credentials.project_id
 
-    :param project_id: str, the project ID
-    :param zone: str, the zone
-
-    :return: list of instances[VMInstance]
-    """
-    credentials = get_credentials()
-    project_id = credentials.project_id
-
-    try:
-        instance_client = compute_v1.InstancesClient(credentials=credentials)
-        request = compute_v1.ListInstancesRequest(project=project_id, zone=zone)  # NOTE: Check if zone is required  --> Yes, it is required if we use this method
-        instances = []
-        for instance in instance_client.list(request=request):
-            instances.append(VMInstance(instance))
-        return instances
-    except Exception as e:
-        logger.add_error(f"collect_resources_in_zone(zone={zone}): {str(e)}")
-        return e.code
+        try:
+            instance_client = compute_v1.InstancesClient(credentials=credentials)
+            request = compute_v1.ListInstancesRequest(project=project_id, zone=zone)  # NOTE: Check if zone is required  --> Yes, it is required if we use this method
+            instances = []
+            for instance in instance_client.list(request=request):
+                instances.append(VMInstance(instance))
+            return instances
+        except Exception as e:
+            self.logger.add_error(f"collect_resources_in_zone(zone={zone}): {str(e)}")
+            return e.code
 
 
 # =============================================================================
-# 3. Main function
+# Main function
 if __name__ == '__main__':
     logger = get_console_logger()
     logger.add_warning("This app cannot be run directly. Please run the main.py file.")

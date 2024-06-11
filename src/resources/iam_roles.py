@@ -1,33 +1,12 @@
 from google.cloud import iam_admin_v1 as iam
 from utils.credentials import get_credentials
-from utils.logging import get_console_logger, get_sub_file_logger
+from utils.logging import get_console_logger
 from utils.resource import Resource
-
-
-### This module is divided into 5 categories of functions:
-# 0. A class to represent a Role
-#
-# 1. A function to return route messages (used in the ../main.py)
-#    - get_route_messages(default_project_id: str) -> str
-# 2. Helper functions to get role objects
-#     - _get_role(project_id: str, role_id: int) -> dict
-#     - _get_all_roles(project_id: str) -> list
-#
-# -. Helper functions to stringify given role objects (deprecated)
-#     - _stringify_role(role: dict, index: int = None, total: int = None) -> str
-#     - _stringify_roles(roles: list) -> str
-#
-# 4. Wrapper functions to get and print role(s) in a project, using the helper functions
-#     - print_role(project_id: str, role_id: int) -> str | None
-#     - print_all_roles(project_id: str) -> str | None
-#
-# 5. Main function
-###
-
-logger = get_sub_file_logger(__name__)
+from utils.logger import get_sub_file_logger
+from utils.collector import Collector
 
 # ==========================================================================
-# 0. A class to represent a Role
+# Resource class
 class Role(Resource):
     """
     A class to represent a Role
@@ -39,19 +18,8 @@ class Role(Resource):
     - stage: str, the role stage
     - included_permissions: list, the role's included permissions
     """
-    def __init__(self, resource: dict = None):
-        super().__init__()
-        self.name = None
-        self.title = None
-        self.description = None
-        self.stage = None
-        self.included_permissions = None
-        if resource:
-            self.set_resource(resource)
-
-    
-    def set_resource(self, resource: dict):
-        super().set_resource(resource)
+    def __init__(self, resource: dict):
+        super().__init__(resource)
         self.name = resource.name
         self.title = resource.title
         self.description = resource.description
@@ -65,8 +33,13 @@ class Role(Resource):
         """
         return self.name
 
+
 # ==========================================================================
-    ### 1. A function to return route messages
+# Collector class
+class IAMRoleCollector(Collector):
+    def __init__(self):
+        super().__init__(__name__)
+
     def get_route_messages(self) -> str:
         return """
 
@@ -78,60 +51,48 @@ class Role(Resource):
             
             """
 
-# =============================================================================
-### 2. Helper functions to get role objects
+    def collect_resource(self, role_id: int) -> Role | int:
+        """
+        Get a role's details
+        
+        :param role_id, int, the role ID
+        
+        :return: dict, the role's details"""
+        credentials = get_credentials()
+        project_id = credentials.project_id
+        role_name = f'projects/{project_id}/roles/{str(role_id)}'
+        try:
+            client = iam.IAMClient(credentials=credentials)
+            request = iam.GetRoleRequest(name=role_name)
+            response = client.get_role(request=request)
+            return Role(response)
+        except Exception as e:
+            self.logger.add_error(f"collect_resource(role_id={role_id}): {str(e)}")
+            return e.code
 
-# 2-1. A function to get a role's details
-def collect_resource(role_id: int) -> Role | int:
-    """
-    Get a role's details
-    
-    :param role_id, int, the role ID
-    
-    :return: dict, the role's details"""
-    credentials = get_credentials()
-    project_id = credentials.project_id
-    role_name = f'projects/{project_id}/roles/{str(role_id)}'
-    try:
-        client = iam.IAMClient(credentials=credentials)
-        request = iam.GetRoleRequest(name=role_name)
-        response = client.get_role(request=request)
-        return Role(response)
-    except Exception as e:
-        logger.add_error(f"collect_resource(role_id={role_id}): {str(e)}")
-        return e.code
+    def collect_resources(self) -> list[Role] | int:
+        """
+        Get all roles in a project
+        
+        :param project_id: str, the project ID
 
-
-# 2-2. A function to get all roles in a project
-def collect_resources() -> list[Role] | int:
-    """
-    Get all roles in a project
-    
-    :param project_id: str, the project ID
-
-    :return: list, all roles in the project
-    """
-    credentials = get_credentials()
-    project_id = credentials.project_id
-    try:
-        client = iam.IAMClient(credentials=credentials)
-        request = iam.ListRolesRequest(parent=f'projects/{project_id}')
-        response = client.list_roles(request=request)
-        roles = [Role(role) for role in response.roles]
-        return roles
-    except Exception as e:
-        logger.add_error(f"collect_resources(): {str(e)}")
-        return e.code
+        :return: list, all roles in the project
+        """
+        credentials = get_credentials()
+        project_id = credentials.project_id
+        try:
+            client = iam.IAMClient(credentials=credentials)
+            request = iam.ListRolesRequest(parent=f'projects/{project_id}')
+            response = client.list_roles(request=request)
+            roles = [Role(role) for role in response.roles]
+            return roles
+        except Exception as e:
+            self.logger.add_error(f"collect_resources(): {str(e)}")
+            return e.code
 
 
 # ==========================================================================
-### 3. Helper functions to stringify given role objects (deprecated)
-
-# ==========================================================================
-### 4. Wrapper functions to get and print role(s) in a project, using the helper functions (deprecated)
-
-# ==========================================================================
-# 5. Main function
+# Main function
 if __name__ == "__main__":
     logger = get_console_logger()
     logger.add_warning("This app cannot be run directly. Please run the main.py file.")

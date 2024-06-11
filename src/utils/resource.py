@@ -1,14 +1,8 @@
 # Abstract Class for All Resources
 class Resource():
-    def __init__(self):
+    def __init__(self, resource: dict):
         """
         Initialize the resource
-        """
-        self._resource = None
-
-    def set_resource(self, resource: dict):
-        """
-        Set the resource
         """
         self._resource = resource
         return

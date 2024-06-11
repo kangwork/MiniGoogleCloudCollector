@@ -2,9 +2,9 @@ import os
 from fastapi import FastAPI, Request
 from utils.logging import setup_logger, setup_main_file_logger, get_console_logger, get_sub_file_logger
 from resources import storage_buckets, iam_roles, vm_instances
-from resources.storage_buckets import StorageBucket
-from resources.iam_roles import Role
-from resources.vm_instances import VMInstance
+from resources.storage_buckets import StorageBucketCollector
+from resources.iam_roles import IAMRoleCollector
+from resources.vm_instances import VMInstanceCollector
 from fastapi.responses import JSONResponse
 import sys
 
@@ -23,19 +23,18 @@ logger = get_sub_file_logger(__name__)
 @app.get("/")
 def read_root(request: Request):
     logger.add_info("read_root(): The root route is accessed.")
-    default_project_id = "YOUR_PROJECT_ID_HERE"
 
     message = """Welcome to the Mini Google Cloud Collector!
     
         Avaialable Routes:
         """
     try:
-        sb = StorageBucket()
-        ir = Role()
-        vi = VMInstance()
-        message += sb.get_route_messages(default_project_id)
-        message += ir.get_route_messages(default_project_id)
-        message += vi.get_route_messages(default_project_id)
+        sbc = StorageBucketCollector()
+        irc = IAMRoleCollector()
+        vic = VMInstanceCollector()
+        message += sbc.get_route_messages()
+        message += irc.get_route_messages()
+        message += vic.get_route_messages()
         return {"data": "", "message": message}
     except Exception as e:
         logger.add_error(f"read_root(): {str(e)}")
