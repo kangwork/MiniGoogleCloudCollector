@@ -23,7 +23,10 @@ Follow the instructions below to set up the GOOGLE_APPLICATION_CREDENTIALS envir
 
 
 ## How to Run the Program
-1. Execute the main program
+1. Navigate to `src/`.
+
+2. Execute the main program.
+    (Note: Make sure you installed all the dependencies in your environment.)
 
     You can execute the program by simply running:
     ```shell
@@ -35,9 +38,9 @@ Follow the instructions below to set up the GOOGLE_APPLICATION_CREDENTIALS envir
     uvicorn main:app --reload
     ```
 
-2. Open a web browser and go to http://localhost:8000 to view the data.
+3. Open a web browser and go to http://localhost:8000 to view the data.
 
-3. Press Ctrl+C to stop the program.
+4. Press Ctrl+C to stop the program.
 
 
 ## Modules
