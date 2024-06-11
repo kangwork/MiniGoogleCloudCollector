@@ -19,13 +19,9 @@ logger = get_sub_file_logger(__name__)
 # 2-1. The root route
 @app.get("/")
 def read_root(request: Request):
-    logger.add_info("read_root(): The root route is accessed.")
-
-    message = """Welcome to the Mini Google Cloud Collector!
-    
-        Avaialable Routes:
-        """
     try:
+        logger.add_info("read_root(): The root route is accessed.")
+        message = "Welcome to the Mini Google Cloud Collector!\n\nAvailable routes:\n"
         sbc = StorageBucketCollector()
         irc = IAMRoleCollector()
         vic = VMInstanceCollector()
