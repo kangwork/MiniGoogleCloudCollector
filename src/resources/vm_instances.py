@@ -1,5 +1,4 @@
 from google.cloud import compute_v1
-from utils.credentials import get_credentials
 from utils.logging import get_console_logger
 from utils.resource import Resource
 from utils.collector import Collector
