@@ -4,6 +4,8 @@
 run: main.py $(shell find . -name "*.py")
 	python3.12 main.py 'y';
 
-# Clean all the .pyc files
+.PHONY: clean
+
+# Clean all the __pycache__ directories
 clean:
-	find . -name "*.pyc" -exec rm -f {} \;
+	find . -name "__pycache__" -exec rm -rf {} \;
