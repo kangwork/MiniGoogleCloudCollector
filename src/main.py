@@ -1,14 +1,11 @@
 import os
 from fastapi import FastAPI, Request
-import uvicorn
-from google.cloud import storage
-from utils.credentials import get_credentials
-from fastapi.exceptions import HTTPException
-from utils.logging import Logger, setup_logger, setup_main_file_logger, get_console_logger, get_sub_file_logger
+from utils.logging import setup_logger, setup_main_file_logger, get_console_logger, get_sub_file_logger
 from resources import storage_buckets, iam_roles, vm_instances
+from resources.storage_buckets import StorageBucket
+from resources.iam_roles import Role
+from resources.vm_instances import VMInstance
 from fastapi.responses import JSONResponse
-import json
-from fastapi.templating import Jinja2Templates
 import sys
 
 
@@ -17,7 +14,6 @@ import sys
 # =============================================================================
 # 0. Setup (Create a FastAPI app, a logger, and templates)
 app = FastAPI()
-templates = Jinja2Templates(directory="../templates")
 logger = get_sub_file_logger(__name__)
 
 
@@ -29,14 +25,17 @@ def read_root(request: Request):
     logger.add_info("read_root(): The root route is accessed.")
     default_project_id = "YOUR_PROJECT_ID_HERE"
 
-    message = f"""Welcome to the Mini Google Cloud Collector!
+    message = """Welcome to the Mini Google Cloud Collector!
     
         Avaialable Routes:
         """
     try:
-        message += storage_buckets.get_route_messages(default_project_id)
-        message += iam_roles.get_route_messages(default_project_id)
-        message += vm_instances.get_route_messages(default_project_id)
+        sb = StorageBucket()
+        ir = Role()
+        vi = VMInstance()
+        message += sb.get_route_messages(default_project_id)
+        message += ir.get_route_messages(default_project_id)
+        message += vi.get_route_messages(default_project_id)
         return {"data": "", "message": message}
     except Exception as e:
         logger.add_error(f"read_root(): {str(e)}")

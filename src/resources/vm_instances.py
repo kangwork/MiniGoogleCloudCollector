@@ -1,6 +1,5 @@
 from google.cloud import compute_v1
 from utils.credentials import get_credentials
-from fastapi.exceptions import HTTPException
 from utils.logging import get_console_logger, get_sub_file_logger
 from utils.resource import Resource
 
@@ -21,16 +20,29 @@ class VMInstance(Resource):
     - network_interfaces: list, the instance network interfaces
     - metadata: dict, the instance metadata
     """
-    def __init__(self, instance: dict):
-        super().__init__(instance)
-        self.name = instance.name
-        self.zone = instance.zone
-        self.machine_type = instance.machine_type
-        self.status = instance.status
-        self.creation_time = instance.creation_timestamp
-        self.disks = instance.disks
-        self.network_interfaces = instance.network_interfaces
-        self.metadata = instance.metadata
+    def __init__(self):
+        super().__init__()
+        self.name = None
+        self.zone = None
+        self.machine_type = None
+        self.status = None
+        self.creation_time = None
+        self.disks = None
+        self.network_interfaces = None
+        self.metadata = None
+    
+
+    def set_resource(self, resource: dict):
+        super().set_resource(resource)
+        self.name = resource.name
+        self.zone = resource.zone
+        self.machine_type = resource.machine_type
+        self.status = resource.status
+        self.creation_time = resource.creation_timestamp
+        self.disks = resource.disks
+        self.network_interfaces = resource.network_interfaces
+        self.metadata = resource.metadata
+
 
     def __str__(self):
         """
@@ -39,19 +51,19 @@ class VMInstance(Resource):
         return f"Zone: {self.zone}, Name: {self.name}"
 
 
-# 1. A function to return route messages
-def get_route_messages(default_project_id: str) -> str:
-    return f"""
+    # 1. A function to return route messages
+    def get_route_messages(self) -> str:
+        return """
 
-        Visit /vm/instances to list all VM instances in your project. Include zone as a query parameter.
-    
-        Visit /vm/instances/ZONE to list all VM instances in a specific zone in your project. Include zone as a query parameter.
-        (Example: /vm/instances/us-west1-b)
+            Visit /vm/instances to list all VM instances in your project. Include zone as a query parameter.
         
-        Visit /vm/instances/ZONE/INSTANCE_NAME to get details of a specific VM instance.
-        (Example: /vm/instances/us-west1-b/mini-collector-instance)
-        
-        """
+            Visit /vm/instances/ZONE to list all VM instances in a specific zone in your project. Include zone as a query parameter.
+            (Example: /vm/instances/us-west1-b)
+            
+            Visit /vm/instances/ZONE/INSTANCE_NAME to get details of a specific VM instance.
+            (Example: /vm/instances/us-west1-b/mini-collector-instance)
+            
+            """
 
 # =============================================================================
 # 2. Helper functions to get instance objects (VM Instances)

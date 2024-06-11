@@ -39,13 +39,22 @@ class Role(Resource):
     - stage: str, the role stage
     - included_permissions: list, the role's included permissions
     """
-    def __init__(self, role: dict):
-        super().__init__(role)
-        self.name = role.name
-        self.title = role.title
-        self.description = role.description
-        self.stage = role.stage
-        self.included_permissions = role.included_permissions
+    def __init__(self):
+        self.name = None
+        self.title = None
+        self.description = None
+        self.stage = None
+        self.included_permissions = None
+
+    
+    def set_resource(self, resource: dict):
+        super().set_resource(resource)
+        self.name = resource.name
+        self.title = resource.title
+        self.description = resource.description
+        self.stage = resource.stage
+        self.included_permissions = resource.included_permissions
+    
 
     def __str__(self):
         """
@@ -54,17 +63,17 @@ class Role(Resource):
         return self.name
 
 # ==========================================================================
-### 1. A function to return route messages
-def get_route_messages(default_project_id: str) -> str:
-    return f"""
+    ### 1. A function to return route messages
+    def get_route_messages(self) -> str:
+        return """
 
-        Visit /iam/roles to list all IAM roles in your project. 
-        (Example: /iam/roles)
+            Visit /iam/roles to list all IAM roles in your project. 
+            (Example: /iam/roles)
 
-        Visit /iam/roles/ROLE_ID to get details of a specific IAM role.
-        (Example: /iam/roles/609)
-        
-        """
+            Visit /iam/roles/ROLE_ID to get details of a specific IAM role.
+            (Example: /iam/roles/609)
+            
+            """
 
 # =============================================================================
 ### 2. Helper functions to get role objects

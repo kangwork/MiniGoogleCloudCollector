@@ -1,5 +1,4 @@
 import os
-import json
 from google import oauth2
 from utils.logging import get_sub_file_logger
 

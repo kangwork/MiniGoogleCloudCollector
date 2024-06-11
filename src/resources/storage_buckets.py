@@ -1,9 +1,5 @@
-import os
-from fastapi import FastAPI
-import uvicorn
 from google.cloud import storage
 from utils.credentials import get_credentials
-from fastapi.exceptions import HTTPException
 from utils.logging import get_console_logger, get_sub_file_logger
 from utils.resource import Resource
 from google.cloud.storage.bucket import Bucket
@@ -38,20 +34,17 @@ class StorageBucket(Resource):
         """
         return self.name
     
+    # 1. A function to return route messages
+    def get_route_messages(self) -> str:
+        return """
 
+            Visit /storage/buckets to list all storage buckets in your project. 
+            (Example: /storage/buckets)
 
-
-# 1. A function to return route messages
-def get_route_messages(default_project_id: str) -> str:
-    return f"""
-
-        Visit /storage/buckets to list all storage buckets in your project. 
-        (Example: /storage/buckets)
-
-        Visit /storage/buckets/BUCKET_NAME to get details of a specific storage bucket.
-        (Example: /storage/buckets/mini-collector-bucket)
-        
-        """
+            Visit /storage/buckets/BUCKET_NAME to get details of a specific storage bucket.
+            (Example: /storage/buckets/mini-collector-bucket)
+            
+            """
 
 
 # =============================================================================
