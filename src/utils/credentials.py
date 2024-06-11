@@ -1,9 +1,9 @@
 import os
-from google import oauth2
+from google.oauth2.service_account import Credentials
 from utils.logging import get_sub_file_logger
 
 # A function to get credentials.
-def get_credentials():
+def get_credentials() -> Credentials:
     credentials_path = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
 
     if not credentials_path:
@@ -12,5 +12,5 @@ def get_credentials():
         logger.add_error(message)
         raise Exception("GOOGLE_APPLICATION_CREDENTIALS environment variable is not set.")
     
-    credentials = oauth2.service_account.Credentials.from_service_account_file(credentials_path)
+    credentials = Credentials.from_service_account_file(credentials_path)
     return credentials

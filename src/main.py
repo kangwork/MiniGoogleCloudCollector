@@ -6,12 +6,14 @@ from resources.iam_roles import IAMRoleCollector
 from resources.vm_instances import VMInstanceCollector
 from fastapi.responses import JSONResponse
 import sys
+from utils.credentials import get_credentials
 
 # A main program to call all the api functions
 # =============================================================================
 # 0. Setup (Create a FastAPI app, a logger, and templates)
 app = FastAPI()
 logger = get_sub_file_logger(__name__)
+credentials = get_credentials()
 
 
 # =============================================================================
@@ -41,7 +43,7 @@ def read_root(request: Request):
 def list_storage_buckets():
     try:
         logger.add_info("list_storage_buckets(): The list_storage_buckets route is accessed.")
-        sbc = StorageBucketCollector()
+        sbc = StorageBucketCollector(credentials)
         resources = sbc.collect_resources()
         simplified_resources = [str(resource) for resource in resources]
         return {"data": simplified_resources, "length": len(resources), "message": "List of all storage buckets in the project."}
@@ -56,7 +58,7 @@ def list_storage_buckets():
 def get_storage_bucket(bucket_name: str):
     try:
         logger.add_info(f"get_storage_bucket(bucket_name={bucket_name}): The get_storage_bucket route is accessed.")
-        sbc = StorageBucketCollector()
+        sbc = StorageBucketCollector(credentials)
         resource = sbc.collect_resource(bucket_name)
         return {"data": resource.__repr__(), "message": "Details of the specific storage bucket."}
     except Exception as e:
@@ -71,7 +73,7 @@ def get_storage_bucket(bucket_name: str):
 def list_iam_roles():
     try:
         logger.add_info("list_iam_roles(): The list_iam_roles route is accessed.")
-        irc = IAMRoleCollector()
+        irc = IAMRoleCollector(credentials)
         resources = irc.collect_resources()
         simplified_resources = [str(resource) for resource in resources]
         return {"data": simplified_resources, "length": len(resources), "message": "List of all IAM roles in the project."}
@@ -87,7 +89,7 @@ def list_iam_roles():
 def get_iam_role(role_id: int):
     try:
         logger.add_info(f"get_iam_role(role_id={role_id}): The get_iam_role route is accessed.")
-        irc = IAMRoleCollector()
+        irc = IAMRoleCollector(credentials)
         resource = irc.collect_resource(role_id)
         return {"data": resource.__repr__(), "message": "Details of the specific IAM role."}
     except Exception as e:
@@ -102,7 +104,7 @@ def get_iam_role(role_id: int):
 def list_vm_instances():
     try:
         logger.add_info("list_vm_instances(): The list_vm_instances route is accessed.")
-        vic = VMInstanceCollector()
+        vic = VMInstanceCollector(credentials)
         resources = vic.collect_resources()
         simplified_resources = [str(resource) for resource in resources]
         return {"data": simplified_resources, "length": len(resources), "message": "List of all VM instances in the project."}
@@ -117,7 +119,7 @@ def list_vm_instances():
 def list_vm_instances_in_zone(zone: str):
     try:
         logger.add_info(f"list_vm_instances_in_zone(zone={zone}): The list_vm_instances_in_zone route is accessed.")
-        vic = VMInstanceCollector()
+        vic = VMInstanceCollector(credentials)
         resources = vic.collect_resources_in_zone(zone)
         simplified_resources = [str(resource) for resource in resources]
         return {"data": simplified_resources, "length": len(resources), "message": f"List of all VM instances in the project in {zone}."}
@@ -131,7 +133,7 @@ def list_vm_instances_in_zone(zone: str):
 def get_vm_instance(zone: str, instance_name: str):
     try:
         logger.add_info(f"get_vm_instance(zone={zone}, instance_name={instance_name}): The get_vm_instance route is accessed.")
-        vic = VMInstanceCollector()
+        vic = VMInstanceCollector(credentials)
         resource = vic.collect_resource(zone, instance_name)
         return {"data": resource.__repr__(), "message": "Details of the specific VM instance."}
     except Exception as e:
@@ -146,9 +148,9 @@ def get_vm_instance(zone: str, instance_name: str):
 def list_all_resources():
     try:
         logger.add_info("list_all_resources(): The list_all_resources route is accessed.")
-        sbc = StorageBucketCollector()
-        irc = IAMRoleCollector()
-        vic = VMInstanceCollector()
+        sbc = StorageBucketCollector(credentials)
+        irc = IAMRoleCollector(credentials)
+        vic = VMInstanceCollector(credentials)
         resources = {
             "storage_buckets": sbc.collect_resources(),
             "iam_roles": irc.collect_resources(),

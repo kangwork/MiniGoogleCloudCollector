@@ -43,8 +43,8 @@ class VMInstance(Resource):
 # =============================================================================
 # Collector class
 class VMInstanceCollector(Collector):
-    def __init__(self):
-        super().__init__(__name__)
+    def __init__(self, credentials=None):
+        super().__init__(__name__, credentials)
 
     def get_route_messages(self) -> str:
         route_messages = {
@@ -63,12 +63,10 @@ class VMInstanceCollector(Collector):
 
         :return: list of instances[VMInstance]
         """
-        credentials = get_credentials()
-        project_id = credentials.project_id
-        instance_client = compute_v1.InstancesClient(credentials=credentials)
+        instance_client = compute_v1.InstancesClient(credentials=self.credentials)
         all_instances = []
 
-        for (_, instances_scoped_list) in instance_client.aggregated_list(project=project_id):
+        for (_, instances_scoped_list) in instance_client.aggregated_list(project=self.project_id):
 
             if instances_scoped_list.warning:
                 continue
@@ -88,10 +86,8 @@ class VMInstanceCollector(Collector):
 
         :return: instance details
         """
-        credentials = get_credentials()
-        project_id = credentials.project_id
-        instance_client = compute_v1.InstancesClient(credentials=credentials)
-        request = compute_v1.GetInstanceRequest(project=project_id, zone=zone, instance=instance_name)
+        instance_client = compute_v1.InstancesClient(credentials=self.credentials)
+        request = compute_v1.GetInstanceRequest(project=self.project_id, zone=zone, instance=instance_name)
         return VMInstance(instance_client.get(request=request))
     
     @error_handler_decorator
@@ -104,10 +100,8 @@ class VMInstanceCollector(Collector):
 
         :return: list of instances[VMInstance]
         """
-        credentials = get_credentials()
-        project_id = credentials.project_id
-        instance_client = compute_v1.InstancesClient(credentials=credentials)
-        request = compute_v1.ListInstancesRequest(project=project_id, zone=zone)
+        instance_client = compute_v1.InstancesClient(credentials=self.credentials)
+        request = compute_v1.ListInstancesRequest(project=self.project_id, zone=zone)
         instances = []
         for instance in instance_client.list(request=request):
             instances.append(VMInstance(instance))

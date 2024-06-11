@@ -1,5 +1,4 @@
 from google.cloud import storage
-from utils.credentials import get_credentials
 from utils.logging import get_console_logger
 from utils.resource import Resource
 from google.cloud.storage.bucket import Bucket
@@ -39,8 +38,8 @@ class StorageBucket(Resource):
 # =============================================================================
 # Collector class
 class StorageBucketCollector(Collector):
-    def __init__(self):
-        super().__init__(__name__)
+    def __init__(self, credentials=None):
+        super().__init__(__name__, credentials)
 
     def get_route_messages(self) -> str:
         route_messages = {
@@ -51,9 +50,7 @@ class StorageBucketCollector(Collector):
 
     @error_handler_decorator
     def collect_resources(self) -> list[StorageBucket]:
-        credentials = get_credentials()
-        project_id = credentials.project_id
-        storage_client = storage.Client(credentials=credentials, project=project_id)
+        storage_client = storage.Client(credentials=self.credentials, project=self.project_id)
         buckets = []
         for bucket in storage_client.list_buckets():
             buckets.append(StorageBucket(bucket))
@@ -61,9 +58,7 @@ class StorageBucketCollector(Collector):
 
     @error_handler_decorator
     def collect_resource(self, bucket_name: str) -> StorageBucket:
-        credentials = get_credentials()
-        project_id = credentials.project_id
-        storage_client = storage.Client(credentials=credentials, project=project_id)
+        storage_client = storage.Client(credentials=self.credentials, project=self.project_id)
         bucket = StorageBucket(storage_client.get_bucket(bucket_name))
         return bucket
 

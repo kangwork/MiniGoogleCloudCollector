@@ -1,4 +1,6 @@
 from utils.logging import get_sub_file_logger
+from google.oauth2.service_account import Credentials
+
 
 class Collector:
     """
@@ -6,9 +8,17 @@ class Collector:
 
     Attributes:
     - logger: Logger, the logger
+    - credentials: Credentials, the credentials
+    - project_id: str, the project ID
     """
-    def __init__(self, collector_name: str):
+    def __init__(self, collector_name: str, credentials: Credentials=None):
         self.logger = get_sub_file_logger(collector_name)
+        if credentials and isinstance(credentials, Credentials):
+            self.credentials = credentials
+            self.project_id = credentials.project_id
+        else:
+            self.credentials = None
+            self.project_id = None
 
     def get_route_messages(self, route_messages: dict[str, (str, str)]) -> str:
         """
