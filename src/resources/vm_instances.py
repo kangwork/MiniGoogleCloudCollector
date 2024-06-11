@@ -20,7 +20,7 @@ class VMInstance(Resource):
     - network_interfaces: list, the instance network interfaces
     - metadata: dict, the instance metadata
     """
-    def __init__(self):
+    def __init__(self, resource: dict = None):
         super().__init__()
         self.name = None
         self.zone = None
@@ -30,6 +30,8 @@ class VMInstance(Resource):
         self.disks = None
         self.network_interfaces = None
         self.metadata = None
+        if resource:
+            self.set_resource(resource)
     
 
     def set_resource(self, resource: dict):

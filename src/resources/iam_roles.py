@@ -39,12 +39,15 @@ class Role(Resource):
     - stage: str, the role stage
     - included_permissions: list, the role's included permissions
     """
-    def __init__(self):
+    def __init__(self, resource: dict = None):
+        super().__init__()
         self.name = None
         self.title = None
         self.description = None
         self.stage = None
         self.included_permissions = None
+        if resource:
+            self.set_resource(resource)
 
     
     def set_resource(self, resource: dict):

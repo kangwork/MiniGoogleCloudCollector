@@ -19,14 +19,25 @@ class StorageBucket(Resource):
     - labels: dict, the bucket labels
     - created: datetime, the bucket creation time
     """
-    def __init__(self, bucket: Bucket):
-        super().__init__(bucket.__dict__)
-        self.name = bucket.name
-        self.location = bucket.location
-        self.storage_class = bucket.storage_class
-        self.lifecycle_rules = bucket.lifecycle_rules
-        self.labels = bucket.labels
-        self.created = bucket.time_created
+    def __init__(self, resource: Bucket = None):
+        super().__init__()
+        self.name = None
+        self.location = None
+        self.storage_class = None
+        self.lifecycle_rules = None
+        self.labels = None
+        self.created = None
+        if resource:
+            self.set_resource(resource)
+
+    def set_resource(self, resource: dict):
+        super().set_resource(resource.__dict__)
+        self.name = resource.name
+        self.location = resource.location
+        self.storage_class = resource.storage_class
+        self.lifecycle_rules = resource.lifecycle_rules
+        self.labels = resource.labels
+        self.created = resource.time_created
 
     def __str__(self):
         """
