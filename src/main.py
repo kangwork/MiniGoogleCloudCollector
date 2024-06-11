@@ -180,13 +180,4 @@ if __name__ == '__main__':
     """
     console_logger.add_info(instruction)
 
-    # If the first argument is not 'y', we will ask a user if they want to log the output in a file
-    if len(sys.argv) > 1 and sys.argv[1].lower() == 'y':
-        setup_main_file_logger(logger)
-    else:
-        print("Do you want to log the output in a file? (y/n):")
-        choice = input()
-        if choice.lower() == 'n':
-            setup_logger(logger, False)
-    
     os.system("uvicorn main:app --reload")

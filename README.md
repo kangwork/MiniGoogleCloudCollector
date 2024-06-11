@@ -10,7 +10,7 @@ The program retrieves the following data from GCP:
 - VM instances
 
 
-Note that the GOOGLE_APPLICATION_CREDENTIALS environment variable must be set to the path of the credentials file.
+Note that the GOOGLE_APPLICATION_CREDENTIALS environment variable must be set to the path of the credentials file. 
 
 ## How to Set Up the Environment Variable
 Follow the instructions below to set up the GOOGLE_APPLICATION_CREDENTIALS environment variable.
