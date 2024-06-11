@@ -35,7 +35,7 @@ def read_root(request: Request):
         return {"data": "", "message": message}
     except Exception as e:
         logger.add_error(f"read_root(): {str(e)}")
-        return JSONResponse(content={"data": "", "message": "Failed to retrieve the route messages."}, status_code=500)
+        return JSONResponse(content={"data": "", "message": "Failed to retrieve the route messages."}, status_code=e.code)
 
 
 ### 2-2. Storage Bucket APIs
@@ -43,56 +43,60 @@ def read_root(request: Request):
 # 2-2-1. A route to list all storage buckets in a project
 @app.get("/storage/buckets")
 def list_storage_buckets():
-    logger.add_info("list_storage_buckets(): The list_storage_buckets route is accessed.")
-    sbc = StorageBucketCollector()
-    resources = sbc.collect_resources() 
-    if isinstance(resources, int):
+    try:
+        logger.add_info("list_storage_buckets(): The list_storage_buckets route is accessed.")
+        sbc = StorageBucketCollector()
+        resources = sbc.collect_resources()
+        simplified_resources = [str(resource) for resource in resources]
+        return {"data": simplified_resources, "length": len(resources), "message": "List of all storage buckets in the project."}
+    except Exception as e:
         logger.add_error("list_storage_buckets(): Failed to retrieve the storage buckets.")
-        return JSONResponse(content={"data": "", "message": "Failed to retrieve the storage buckets."}, status_code=resources)
-    simplified_resources = [str(resource) for resource in resources]
-    return {"data": simplified_resources, "length": len(resources), "message": "List of all storage buckets in the project."}
-
+        return JSONResponse(content={"data": "", "message": "Failed to retrieve the storage buckets."}, status_code=e.code)
+    
 
 # Example use: http://localhost/storage/buckets/airbyte_testing_001
 # 2-2-2. A route to get a storage bucket's details
 @app.get("/storage/buckets/{bucket_name}")
 def get_storage_bucket(bucket_name: str):
-    logger.add_info(f"get_storage_bucket(bucket_name={bucket_name}): The get_storage_bucket route is accessed.")
-    sbc = StorageBucketCollector()
-    resource = sbc.collect_resource(bucket_name)
-    if isinstance(resource, int):
+    try:
+        logger.add_info(f"get_storage_bucket(bucket_name={bucket_name}): The get_storage_bucket route is accessed.")
+        sbc = StorageBucketCollector()
+        resource = sbc.collect_resource(bucket_name)
+        return {"data": resource.__repr__(), "message": "Details of the specific storage bucket."}
+    except Exception as e:
         logger.add_error(f"get_storage_bucket(bucket_name={bucket_name}): Failed to retrieve the storage bucket.")
-        return JSONResponse(content={"data": "", "message": "Failed to retrieve the storage bucket."}, status_code=resource)
-    return {"data": resource.__repr__(), "message": "Details of the specific storage bucket."}
-
+        return JSONResponse(content={"data": "", "message": "Failed to retrieve the storage bucket."}, status_code=e.code)
+    
 
 ### 2-3. IAM Roles APIs
 # 2-3-1. A route to list all IAM roles in a project
 # Example use: http://localhost/iam/roles
 @app.get("/iam/roles")
 def list_iam_roles():
-    logger.add_info("list_iam_roles(): The list_iam_roles route is accessed.")
-    irc = IAMRoleCollector()
-    resources = irc.collect_resources()
-    if isinstance(resources, int):
+    try:
+        logger.add_info("list_iam_roles(): The list_iam_roles route is accessed.")
+        irc = IAMRoleCollector()
+        resources = irc.collect_resources()
+        simplified_resources = [str(resource) for resource in resources]
+        return {"data": simplified_resources, "length": len(resources), "message": "List of all IAM roles in the project."}
+    except Exception as e:
         logger.add_error("list_iam_roles(): Failed to retrieve the IAM roles.")
-        return JSONResponse(content={"data": "", "message": "Failed to retrieve the IAM roles."}, status_code=resources)
-    simplified_resources = [str(resource) for resource in resources]
-    return {"data": simplified_resources, "length": len(resources), "message": "List of all IAM roles in the project."}
+        return JSONResponse(content={"data": "", "message": "Failed to retrieve the IAM roles."}, status_code=e.code)
 
 
+# 2-3-2. A route to get details of a specific IAM role
 # Example use: http://localhost/iam/roles/609
 # Example use: http://localhost/iam/roles/261
-# 2-3-2. A route to get details of a specific IAM role
 @app.get("/iam/roles/{role_id}")
 def get_iam_role(role_id: int):
-    logger.add_info(f"get_iam_role(role_id={role_id}): The get_iam_role route is accessed.")
-    irc = IAMRoleCollector()
-    resource = irc.collect_resource(role_id)
-    if isinstance(resource, int):
-        logger.add_error(f"get_iam_role(role_id={role_id}): Failed to retrieve the IAM role.")
-        return JSONResponse(content={"data": "", "message": "Failed to retrieve the IAM role."}, status_code=resource)
-    return {"data": resource.__repr__(), "message": "Details of the specific IAM role."}
+    try:
+        logger.add_info(f"get_iam_role(role_id={role_id}): The get_iam_role route is accessed.")
+        irc = IAMRoleCollector()
+        resource = irc.collect_resource(role_id)
+        return {"data": resource.__repr__(), "message": "Details of the specific IAM role."}
+    except Exception as e:
+        logger.add_error(f"get_iam_role(role_id={role_id}): {str(e)}")
+        return JSONResponse(content={"data": "", "message": "Failed to retrieve the IAM role."}, status_code=e.code)
 
 
 ### 2-4. VM Instances APIs
@@ -100,42 +104,70 @@ def get_iam_role(role_id: int):
 # Example use: http://localhost/vm/instances/us-west1-b
 @app.get("/vm/instances")
 def list_vm_instances():
-    logger.add_info("list_vm_instances(): The list_vm_instances route is accessed.")
-    vic = VMInstanceCollector()
-    resources = vic.collect_resources()
-    if isinstance(resources, int):
+    try:
+        logger.add_info("list_vm_instances(): The list_vm_instances route is accessed.")
+        vic = VMInstanceCollector()
+        resources = vic.collect_resources()
+        simplified_resources = [str(resource) for resource in resources]
+        return {"data": simplified_resources, "length": len(resources), "message": "List of all VM instances in the project."}
+    except Exception as e:
         logger.add_error("list_vm_instances(): Failed to retrieve the VM instances.")
-        return JSONResponse(content={"data": "", "message": "Failed to retrieve the VM instances."}, status_code=resources)
-    simplified_resources = [str(resource) for resource in resources]
-    return {"data": simplified_resources, "length": len(resources), "message": "List of all VM instances in the project."}
+        return JSONResponse(content={"data": "", "message": "Failed to retrieve the VM instances."}, status_code=e.code)
 
 
 # 2-4-2. A route to list all VM instances in a project in a specific zone
 # Example use: http://localhost/vm/instances/us-west1-b
 @app.get("/vm/instances/{zone}")
 def list_vm_instances_in_zone(zone: str):
-    logger.add_info(f"list_vm_instances_in_zone(zone={zone}): The list_vm_instances_in_zone route is accessed.")
-    vic = VMInstanceCollector()
-    resources = vic.collect_resources_in_zone(zone)
-    if isinstance(resources, int):
+    try:
+        logger.add_info(f"list_vm_instances_in_zone(zone={zone}): The list_vm_instances_in_zone route is accessed.")
+        vic = VMInstanceCollector()
+        resources = vic.collect_resources_in_zone(zone)
+        simplified_resources = [str(resource) for resource in resources]
+        return {"data": simplified_resources, "length": len(resources), "message": f"List of all VM instances in the project in {zone}."}
+    except Exception as e:
         logger.add_error(f"list_vm_instances_in_zone(zone={zone}): Failed to retrieve the VM instances in {zone}.")
-        return JSONResponse(content={"data": "", "message": f"Failed to retrieve the VM instances in {zone}."}, status_code=resources)
-    simplified_resources = [str(resource) for resource in resources]
-    return {"data": simplified_resources, "length": len(resources), "message": f"List of all VM instances in the project in {zone}."}
+        return JSONResponse(content={"data": "", "message": f"Failed to retrieve the VM instances in {zone}."}, status_code=e.code)
+    
 
-
-# Example use: http://localhost/vm/instances/us-west1-b/mini-collector-instance
 # 2-4-3. A route to get details of a specific VM instance
 @app.get("/vm/instances/{zone}/{instance_name}")
 def get_vm_instance(zone: str, instance_name: str):
-    logger.add_info(f"get_vm_instance(zone={zone}, instance_name={instance_name}): The get_vm_instance route is accessed.")
-    vic = VMInstanceCollector()
-    resource = vic.collect_resource(zone, instance_name)
-    if isinstance(resource, int):
-        logger.add_error(f"get_vm_instance(zone={zone}, instance_name={instance_name}): Failed to retrieve the VM instance.")
-        return JSONResponse(content={"data": "", "message": "Failed to retrieve the VM instance."}, status_code=resource)
-    return {"data": resource.__repr__(), "message": "Details of the specific VM instance."}
+    try:
+        logger.add_info(f"get_vm_instance(zone={zone}, instance_name={instance_name}): The get_vm_instance route is accessed.")
+        vic = VMInstanceCollector()
+        resource = vic.collect_resource(zone, instance_name)
+        return {"data": resource.__repr__(), "message": "Details of the specific VM instance."}
+    except Exception as e:
+        logger.add_error(f"get_vm_instance(zone={zone}, instance_name={instance_name}): {str(e)}")
+        return JSONResponse(content={"data": "", "message": "Failed to retrieve the VM instance."}, status_code=e.code)
 
+
+### 2-5. All Three at Once
+# 2-5-1. A route to list all resources in a project
+# Example use: http://localhost/all-resources
+@app.get("/all-resources")
+def list_all_resources():
+    try:
+        logger.add_info("list_all_resources(): The list_all_resources route is accessed.")
+        sbc = StorageBucketCollector()
+        irc = IAMRoleCollector()
+        vic = VMInstanceCollector()
+        resources = {
+            "storage_buckets": sbc.collect_resources(),
+            "iam_roles": irc.collect_resources(),
+            "vm_instances": vic.collect_resources()
+        }
+        simplified_resources = {
+        "storage_buckets": [str(resource) for resource in resources["storage_buckets"]],
+        "iam_roles": [str(resource) for resource in resources["iam_roles"]],
+        "vm_instances": [str(resource) for resource in resources["vm_instances"]]
+        }
+        return {"data": simplified_resources, "message": "List of all resources in the project."}
+    except Exception as e:
+        logger.add_error(f"list_all_resources(): {str(e)}")
+        return JSONResponse(content={"data": "", "message": "Failed to retrieve all resources."}, status_code=e.code)
+    
 
 # =============================================================================
 # 3. Main function (Run the app)

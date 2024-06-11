@@ -4,6 +4,7 @@ from utils.logging import get_console_logger
 from utils.resource import Resource
 from google.cloud.storage.bucket import Bucket
 from utils.collector import Collector
+from utils.decorators import error_handler_decorator
 
 # ==========================================================================
 # Resource class
@@ -48,33 +49,23 @@ class StorageBucketCollector(Collector):
         }
         return super().get_route_messages(route_messages)
 
-    def collect_resources(self) -> list[StorageBucket] | int:
+    @error_handler_decorator
+    def collect_resources(self) -> list[StorageBucket]:
         credentials = get_credentials()
         project_id = credentials.project_id
+        storage_client = storage.Client(credentials=credentials, project=project_id)
+        buckets = []
+        for bucket in storage_client.list_buckets():
+            buckets.append(StorageBucket(bucket))
+        return buckets
 
-        try:
-            storage_client = storage.Client(credentials=credentials, project=project_id)
-            buckets = []
-            for bucket in storage_client.list_buckets():
-                buckets.append(StorageBucket(bucket))
-            return buckets
-        
-        except Exception as e:
-            self.logger.add_error(f"collect_resources(): {str(e)}")
-            return e.code
-
-    def collect_resource(self, bucket_name: str) -> StorageBucket | int:
+    @error_handler_decorator
+    def collect_resource(self, bucket_name: str) -> StorageBucket:
         credentials = get_credentials()
         project_id = credentials.project_id
-
-        try:
-            storage_client = storage.Client(credentials=credentials, project=project_id)
-            bucket = StorageBucket(storage_client.get_bucket(bucket_name))
-            return bucket
-
-        except Exception as e:
-            self.logger.add_error(f"collect_resource(bucket_name={bucket_name}): {str(e)}")
-            return e.code
+        storage_client = storage.Client(credentials=credentials, project=project_id)
+        bucket = StorageBucket(storage_client.get_bucket(bucket_name))
+        return bucket
 
 
 # =============================================================================

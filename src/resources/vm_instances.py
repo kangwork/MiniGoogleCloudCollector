@@ -3,6 +3,7 @@ from utils.credentials import get_credentials
 from utils.logging import get_console_logger
 from utils.resource import Resource
 from utils.collector import Collector
+from utils.decorators import error_handler_decorator
 
 # ==========================================================================
 # Resource class
@@ -53,7 +54,8 @@ class VMInstanceCollector(Collector):
         }
         return super().get_route_messages(route_messages)
 
-    def collect_resources(self) -> list[VMInstance] | int:
+    @error_handler_decorator
+    def collect_resources(self) -> list[VMInstance]:
         """
         List all instances in a project
 
@@ -63,24 +65,20 @@ class VMInstanceCollector(Collector):
         """
         credentials = get_credentials()
         project_id = credentials.project_id
+        instance_client = compute_v1.InstancesClient(credentials=credentials)
+        all_instances = []
 
-        try:
-            instance_client = compute_v1.InstancesClient(credentials=credentials)
-            all_instances = []
+        for (_, instances_scoped_list) in instance_client.aggregated_list(project=project_id):
 
-            for (_, instances_scoped_list) in instance_client.aggregated_list(project=project_id):
+            if instances_scoped_list.warning:
+                continue
+            else:
+                all_instances.extend(VMInstance(instance) for instance in instances_scoped_list.instances)
 
-                if instances_scoped_list.warning:
-                    continue
-                else:
-                    all_instances.extend(VMInstance(instance) for instance in instances_scoped_list.instances)
+        return all_instances
 
-            return all_instances
-        except Exception as e:
-            self.logger.add_error(f"collect_resources(): {str(e)}")
-            return e.code
-
-    def collect_resource(self, zone: str, instance_name: str) -> VMInstance | int:
+    @error_handler_decorator
+    def collect_resource(self, zone: str, instance_name: str) -> VMInstance:
         """
         Get details of a specific instance
 
@@ -92,16 +90,12 @@ class VMInstanceCollector(Collector):
         """
         credentials = get_credentials()
         project_id = credentials.project_id
-
-        try:
-            instance_client = compute_v1.InstancesClient(credentials=credentials)
-            request = compute_v1.GetInstanceRequest(project=project_id, zone=zone, instance=instance_name)
-            return VMInstance(instance_client.get(request=request))
-        except Exception as e:
-            self.logger.add_error(f"collect_resource(zone={zone}, instance_name:{instance_name}): {str(e)}")
-            return e.code
-        
-    def collect_resources_in_zone(self, zone: str) -> list[VMInstance] | int:
+        instance_client = compute_v1.InstancesClient(credentials=credentials)
+        request = compute_v1.GetInstanceRequest(project=project_id, zone=zone, instance=instance_name)
+        return VMInstance(instance_client.get(request=request))
+    
+    @error_handler_decorator
+    def collect_resources_in_zone(self, zone: str) -> list[VMInstance]:
         """
         List all instances in a project
 
@@ -112,17 +106,12 @@ class VMInstanceCollector(Collector):
         """
         credentials = get_credentials()
         project_id = credentials.project_id
-
-        try:
-            instance_client = compute_v1.InstancesClient(credentials=credentials)
-            request = compute_v1.ListInstancesRequest(project=project_id, zone=zone)  # NOTE: Check if zone is required  --> Yes, it is required if we use this method
-            instances = []
-            for instance in instance_client.list(request=request):
-                instances.append(VMInstance(instance))
-            return instances
-        except Exception as e:
-            self.logger.add_error(f"collect_resources_in_zone(zone={zone}): {str(e)}")
-            return e.code
+        instance_client = compute_v1.InstancesClient(credentials=credentials)
+        request = compute_v1.ListInstancesRequest(project=project_id, zone=zone)
+        instances = []
+        for instance in instance_client.list(request=request):
+            instances.append(VMInstance(instance))
+        return instances
 
 
 # =============================================================================

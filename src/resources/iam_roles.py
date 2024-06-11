@@ -3,6 +3,7 @@ from utils.credentials import get_credentials
 from utils.logging import get_console_logger
 from utils.resource import Resource
 from utils.collector import Collector
+from utils.decorators import error_handler_decorator
 
 # ==========================================================================
 # Resource class
@@ -46,7 +47,8 @@ class IAMRoleCollector(Collector):
         }
         return super().get_route_messages(route_messages)
 
-    def collect_resource(self, role_id: int) -> Role | int:
+    @error_handler_decorator
+    def collect_resource(self, role_id: int) -> Role:
         """
         Get a role's details
         
@@ -56,16 +58,13 @@ class IAMRoleCollector(Collector):
         credentials = get_credentials()
         project_id = credentials.project_id
         role_name = f'projects/{project_id}/roles/{str(role_id)}'
-        try:
-            client = iam.IAMClient(credentials=credentials)
-            request = iam.GetRoleRequest(name=role_name)
-            response = client.get_role(request=request)
-            return Role(response)
-        except Exception as e:
-            self.logger.add_error(f"collect_resource(role_id={role_id}): {str(e)}")
-            return e.code
+        client = iam.IAMClient(credentials=credentials)
+        request = iam.GetRoleRequest(name=role_name)
+        response = client.get_role(request=request)
+        return Role(response)
 
-    def collect_resources(self) -> list[Role] | int:
+    @error_handler_decorator
+    def collect_resources(self) -> list[Role]:
         """
         Get all roles in a project
         
@@ -75,15 +74,11 @@ class IAMRoleCollector(Collector):
         """
         credentials = get_credentials()
         project_id = credentials.project_id
-        try:
-            client = iam.IAMClient(credentials=credentials)
-            request = iam.ListRolesRequest(parent=f'projects/{project_id}')
-            response = client.list_roles(request=request)
-            roles = [Role(role) for role in response.roles]
-            return roles
-        except Exception as e:
-            self.logger.add_error(f"collect_resources(): {str(e)}")
-            return e.code
+        client = iam.IAMClient(credentials=credentials)
+        request = iam.ListRolesRequest(parent=f'projects/{project_id}')
+        response = client.list_roles(request=request)
+        roles = [Role(role) for role in response.roles]
+        return roles
 
 
 # ==========================================================================
