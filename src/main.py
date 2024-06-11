@@ -7,9 +7,7 @@ from resources.vm_instances import VMInstanceCollector
 from fastapi.responses import JSONResponse
 import sys
 
-
 # A main program to call all the api functions
-
 # =============================================================================
 # 0. Setup (Create a FastAPI app, a logger, and templates)
 app = FastAPI()
@@ -124,7 +122,6 @@ def list_vm_instances_in_zone(zone: str):
         return JSONResponse(content={"data": "", "message": f"Failed to retrieve the VM instances in {zone}."}, status_code=resources)
     simplified_resources = [str(resource) for resource in resources]
     return {"data": simplified_resources, "length": len(resources), "message": f"List of all VM instances in the project in {zone}."}
-
 
 
 # Example use: http://localhost/vm/instances/us-west1-b/mini-collector-instance

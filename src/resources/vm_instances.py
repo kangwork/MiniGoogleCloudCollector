@@ -46,17 +46,12 @@ class VMInstanceCollector(Collector):
         super().__init__(__name__)
 
     def get_route_messages(self) -> str:
-        return """
-
-            Visit /vm/instances to list all VM instances in your project. Include zone as a query parameter.
-        
-            Visit /vm/instances/ZONE to list all VM instances in a specific zone in your project. Include zone as a query parameter.
-            (Example: /vm/instances/us-west1-b)
-            
-            Visit /vm/instances/ZONE/INSTANCE_NAME to get details of a specific VM instance.
-            (Example: /vm/instances/us-west1-b/mini-collector-instance)
-            
-            """
+        route_messages = {
+            "/vm/instances": ("List all VM instances in your project.", "/vm/instances"),
+            "/vm/instances/ZONE": ("List all VM instances in a specific zone in your project. Include zone as a query parameter.", "/vm/instances/us-west1-b"),
+            "/vm/instances/ZONE/INSTANCE_NAME": ("Get details of a specific VM instance.", "/vm/instances/us-west1-b/mini-collector-instance")
+        }
+        return super().get_route_messages(route_messages)
 
     def collect_resources(self) -> list[VMInstance] | int:
         """

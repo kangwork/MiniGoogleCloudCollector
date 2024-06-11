@@ -40,15 +40,11 @@ class IAMRoleCollector(Collector):
         super().__init__(__name__)
 
     def get_route_messages(self) -> str:
-        return """
-
-            Visit /iam/roles to list all IAM roles in your project. 
-            (Example: /iam/roles)
-
-            Visit /iam/roles/ROLE_ID to get details of a specific IAM role.
-            (Example: /iam/roles/609)
-            
-            """
+        route_messages = {
+            "/iam/roles": ("List all roles in your project.", "/iam/roles"),
+            "/iam/roles/ROLE_ID": ("Get details of a specific role.", "/iam/roles/123456789")
+        }
+        return super().get_route_messages(route_messages)
 
     def collect_resource(self, role_id: int) -> Role | int:
         """

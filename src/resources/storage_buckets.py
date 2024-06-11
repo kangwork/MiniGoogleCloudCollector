@@ -42,15 +42,11 @@ class StorageBucketCollector(Collector):
         super().__init__(__name__)
 
     def get_route_messages(self) -> str:
-        return """
-
-            Visit /storage/buckets to list all storage buckets in your project. 
-            (Example: /storage/buckets)
-
-            Visit /storage/buckets/BUCKET_NAME to get details of a specific storage bucket.
-            (Example: /storage/buckets/mini-collector-bucket)
-            
-            """
+        route_messages = {
+            "/storage/buckets": ("List all storage buckets in your project.", "/storage/buckets"),
+            "/storage/buckets/BUCKET_NAME": ("Get details of a specific storage bucket.", "/storage/buckets/mini-collector-bucket")
+        }
+        return super().get_route_messages(route_messages)
 
     def collect_resources(self) -> list[StorageBucket] | int:
         credentials = get_credentials()
