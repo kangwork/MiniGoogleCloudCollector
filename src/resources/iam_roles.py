@@ -2,7 +2,6 @@ from google.cloud import iam_admin_v1 as iam
 from utils.credentials import get_credentials
 from utils.logging import get_console_logger
 from utils.resource import Resource
-from utils.logger import get_sub_file_logger
 from utils.collector import Collector
 
 # ==========================================================================

@@ -71,15 +71,16 @@ class VMInstanceCollector(Collector):
 
         try:
             instance_client = compute_v1.InstancesClient(credentials=credentials)
-            instances = []
-            for (zone_info, instances_scoped_list) in instance_client.aggregated_list(project=project_id):
-                zone_instances, warning = instances_scoped_list.instances, instances_scoped_list.warning
-                if warning:
+            all_instances = []
+
+            for (_, instances_scoped_list) in instance_client.aggregated_list(project=project_id):
+
+                if instances_scoped_list.warning:
                     continue
                 else:
-                    for instance in zone_instances:
-                        instances.append(VMInstance(instance))
-            return instances
+                    all_instances.extend(VMInstance(instance) for instance in instances_scoped_list.instances)
+
+            return all_instances
         except Exception as e:
             self.logger.add_error(f"collect_resources(): {str(e)}")
             return e.code

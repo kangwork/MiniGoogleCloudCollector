@@ -1,4 +1,4 @@
-from utils.logger import get_sub_file_logger
+from utils.logging import get_sub_file_logger
 
 class Collector:
     """
@@ -9,7 +9,7 @@ class Collector:
     """
     def __init__(self, collector_name: str):
         self.logger = get_sub_file_logger(collector_name)
-        
+
     def collect_resources(self):
         """
         Collect all resources in the project

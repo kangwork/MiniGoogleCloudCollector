@@ -1,7 +1,6 @@
 import os
 from fastapi import FastAPI, Request
 from utils.logging import setup_logger, setup_main_file_logger, get_console_logger, get_sub_file_logger
-from resources import storage_buckets, iam_roles, vm_instances
 from resources.storage_buckets import StorageBucketCollector
 from resources.iam_roles import IAMRoleCollector
 from resources.vm_instances import VMInstanceCollector
@@ -47,7 +46,8 @@ def read_root(request: Request):
 @app.get("/storage/buckets")
 def list_storage_buckets():
     logger.add_info("list_storage_buckets(): The list_storage_buckets route is accessed.")
-    resources = storage_buckets.collect_resources() 
+    sbc = StorageBucketCollector()
+    resources = sbc.collect_resources() 
     if isinstance(resources, int):
         logger.add_error("list_storage_buckets(): Failed to retrieve the storage buckets.")
         return JSONResponse(content={"data": "", "message": "Failed to retrieve the storage buckets."}, status_code=resources)
@@ -60,7 +60,8 @@ def list_storage_buckets():
 @app.get("/storage/buckets/{bucket_name}")
 def get_storage_bucket(bucket_name: str):
     logger.add_info(f"get_storage_bucket(bucket_name={bucket_name}): The get_storage_bucket route is accessed.")
-    resource = storage_buckets.collect_resource(bucket_name)
+    sbc = StorageBucketCollector()
+    resource = sbc.collect_resource(bucket_name)
     if isinstance(resource, int):
         logger.add_error(f"get_storage_bucket(bucket_name={bucket_name}): Failed to retrieve the storage bucket.")
         return JSONResponse(content={"data": "", "message": "Failed to retrieve the storage bucket."}, status_code=resource)
@@ -73,7 +74,8 @@ def get_storage_bucket(bucket_name: str):
 @app.get("/iam/roles")
 def list_iam_roles():
     logger.add_info("list_iam_roles(): The list_iam_roles route is accessed.")
-    resources = iam_roles.collect_resources()
+    irc = IAMRoleCollector()
+    resources = irc.collect_resources()
     if isinstance(resources, int):
         logger.add_error("list_iam_roles(): Failed to retrieve the IAM roles.")
         return JSONResponse(content={"data": "", "message": "Failed to retrieve the IAM roles."}, status_code=resources)
@@ -87,7 +89,8 @@ def list_iam_roles():
 @app.get("/iam/roles/{role_id}")
 def get_iam_role(role_id: int):
     logger.add_info(f"get_iam_role(role_id={role_id}): The get_iam_role route is accessed.")
-    resource = iam_roles.collect_resource(role_id)
+    irc = IAMRoleCollector()
+    resource = irc.collect_resource(role_id)
     if isinstance(resource, int):
         logger.add_error(f"get_iam_role(role_id={role_id}): Failed to retrieve the IAM role.")
         return JSONResponse(content={"data": "", "message": "Failed to retrieve the IAM role."}, status_code=resource)
@@ -100,7 +103,8 @@ def get_iam_role(role_id: int):
 @app.get("/vm/instances")
 def list_vm_instances():
     logger.add_info("list_vm_instances(): The list_vm_instances route is accessed.")
-    resources = vm_instances.collect_resources()
+    vic = VMInstanceCollector()
+    resources = vic.collect_resources()
     if isinstance(resources, int):
         logger.add_error("list_vm_instances(): Failed to retrieve the VM instances.")
         return JSONResponse(content={"data": "", "message": "Failed to retrieve the VM instances."}, status_code=resources)
@@ -113,7 +117,8 @@ def list_vm_instances():
 @app.get("/vm/instances/{zone}")
 def list_vm_instances_in_zone(zone: str):
     logger.add_info(f"list_vm_instances_in_zone(zone={zone}): The list_vm_instances_in_zone route is accessed.")
-    resources = vm_instances.collect_resources_in_zone(zone)
+    vic = VMInstanceCollector()
+    resources = vic.collect_resources_in_zone(zone)
     if isinstance(resources, int):
         logger.add_error(f"list_vm_instances_in_zone(zone={zone}): Failed to retrieve the VM instances in {zone}.")
         return JSONResponse(content={"data": "", "message": f"Failed to retrieve the VM instances in {zone}."}, status_code=resources)
@@ -127,7 +132,8 @@ def list_vm_instances_in_zone(zone: str):
 @app.get("/vm/instances/{zone}/{instance_name}")
 def get_vm_instance(zone: str, instance_name: str):
     logger.add_info(f"get_vm_instance(zone={zone}, instance_name={instance_name}): The get_vm_instance route is accessed.")
-    resource = vm_instances.collect_resource(zone, instance_name)
+    vic = VMInstanceCollector()
+    resource = vic.collect_resource(zone, instance_name)
     if isinstance(resource, int):
         logger.add_error(f"get_vm_instance(zone={zone}, instance_name={instance_name}): Failed to retrieve the VM instance.")
         return JSONResponse(content={"data": "", "message": "Failed to retrieve the VM instance."}, status_code=resource)
