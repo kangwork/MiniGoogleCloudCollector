@@ -1,11 +1,15 @@
 # Makefile for the MiniGoogleCloudCollector project
 
-venv: pkg/requirements.txt
-	python3.12 -m venv venv
-	. venv/bin/activate; pip install -r pkg/requirements.txt
+requirements = ../pkg/pip_requirements.txt
 
-run: venv main.py $(shell find . -name "*.py")
-	python3.12 main.py 'y';
+venv: $(requirements)
+	python -m venv venv
+	source venv/bin/activate
+	pip install -r $(requirements);
+
+# this should be run after the venv target
+run: main.py $(shell find . -name "*.py")
+	python main.py 'y';
 
 .PHONY: clean
 
