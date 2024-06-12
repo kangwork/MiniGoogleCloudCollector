@@ -4,6 +4,7 @@ from utils.resource import Resource
 from utils.collector import Collector
 from utils.decorators import error_handler_decorator
 
+
 # ==========================================================================
 # Resource class
 class VMInstance(Resource):
@@ -20,6 +21,7 @@ class VMInstance(Resource):
     - network_interfaces: list, the instance network interfaces
     - metadata: dict, the instance metadata
     """
+
     def __init__(self, resource: dict):
         super().__init__(resource)
         self.name = resource.name
@@ -30,7 +32,6 @@ class VMInstance(Resource):
         self.disks = resource.disks
         self.network_interfaces = resource.network_interfaces
         self.metadata = resource.metadata
-
 
     def __str__(self):
         """
@@ -47,9 +48,18 @@ class VMInstanceCollector(Collector):
 
     def get_route_messages(self) -> str:
         route_messages = {
-            "/vm/instances": ("List all VM instances in your project.", "/vm/instances"),
-            "/vm/instances/ZONE": ("List all VM instances in a specific zone in your project. Include zone as a query parameter.", "/vm/instances/us-west1-b"),
-            "/vm/instances/ZONE/INSTANCE_NAME": ("Get details of a specific VM instance.", "/vm/instances/us-west1-b/mini-collector-instance")
+            "/vm/instances": (
+                "List all VM instances in your project.",
+                "/vm/instances",
+            ),
+            "/vm/instances/ZONE": (
+                "List all VM instances in a specific zone in your project. Include zone as a query parameter.",
+                "/vm/instances/us-west1-b",
+            ),
+            "/vm/instances/ZONE/INSTANCE_NAME": (
+                "Get details of a specific VM instance.",
+                "/vm/instances/us-west1-b/mini-collector-instance",
+            ),
         }
         return super().get_route_messages(route_messages)
 
@@ -65,12 +75,16 @@ class VMInstanceCollector(Collector):
         instance_client = compute_v1.InstancesClient(credentials=self.credentials)
         all_instances = []
 
-        for (_, instances_scoped_list) in instance_client.aggregated_list(project=self.project_id):
+        for _, instances_scoped_list in instance_client.aggregated_list(
+            project=self.project_id
+        ):
 
             if instances_scoped_list.warning:
                 continue
             else:
-                all_instances.extend(VMInstance(instance) for instance in instances_scoped_list.instances)
+                all_instances.extend(
+                    VMInstance(instance) for instance in instances_scoped_list.instances
+                )
 
         return all_instances
 
@@ -86,9 +100,11 @@ class VMInstanceCollector(Collector):
         :return: instance details
         """
         instance_client = compute_v1.InstancesClient(credentials=self.credentials)
-        request = compute_v1.GetInstanceRequest(project=self.project_id, zone=zone, instance=instance_name)
+        request = compute_v1.GetInstanceRequest(
+            project=self.project_id, zone=zone, instance=instance_name
+        )
         return VMInstance(instance_client.get(request=request))
-    
+
     @error_handler_decorator
     def collect_resources_in_zone(self, zone: str) -> list[VMInstance]:
         """

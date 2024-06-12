@@ -5,6 +5,7 @@ from google.cloud.storage.bucket import Bucket
 from utils.collector import Collector
 from utils.decorators import error_handler_decorator
 
+
 # ==========================================================================
 # Resource class
 class StorageBucket(Resource):
@@ -19,6 +20,7 @@ class StorageBucket(Resource):
     - labels: dict, the bucket labels
     - created: datetime, the bucket creation time
     """
+
     def __init__(self, resource: Bucket):
         super().__init__(resource.__dict__)
         self.name = resource.name
@@ -43,14 +45,22 @@ class StorageBucketCollector(Collector):
 
     def get_route_messages(self) -> str:
         route_messages = {
-            "/storage/buckets": ("List all storage buckets in your project.", "/storage/buckets"),
-            "/storage/buckets/BUCKET_NAME": ("Get details of a specific storage bucket.", "/storage/buckets/mini-collector-bucket")
+            "/storage/buckets": (
+                "List all storage buckets in your project.",
+                "/storage/buckets",
+            ),
+            "/storage/buckets/BUCKET_NAME": (
+                "Get details of a specific storage bucket.",
+                "/storage/buckets/mini-collector-bucket",
+            ),
         }
         return super().get_route_messages(route_messages)
 
     @error_handler_decorator
     def collect_resources(self) -> list[StorageBucket]:
-        storage_client = storage.Client(credentials=self.credentials, project=self.project_id)
+        storage_client = storage.Client(
+            credentials=self.credentials, project=self.project_id
+        )
         buckets = []
         for bucket in storage_client.list_buckets():
             buckets.append(StorageBucket(bucket))
@@ -58,6 +68,8 @@ class StorageBucketCollector(Collector):
 
     @error_handler_decorator
     def collect_resource(self, bucket_name: str) -> StorageBucket:
-        storage_client = storage.Client(credentials=self.credentials, project=self.project_id)
+        storage_client = storage.Client(
+            credentials=self.credentials, project=self.project_id
+        )
         bucket = StorageBucket(storage_client.get_bucket(bucket_name))
         return bucket

@@ -11,7 +11,8 @@ class Collector:
     - credentials: Credentials, the credentials
     - project_id: str, the project ID
     """
-    def __init__(self, collector_name: str, credentials: Credentials=None):
+
+    def __init__(self, collector_name: str, credentials: Credentials = None):
         self.logger = get_sub_file_logger(collector_name)
         if credentials and isinstance(credentials, Credentials):
             self.credentials = credentials
@@ -31,7 +32,9 @@ class Collector:
         :return: str, the route messages
         """
         if not route_messages:
-            raise NotImplementedError("The route_messages should be provided from the child collector class.")
+            raise NotImplementedError(
+                "The route_messages should be provided from the child collector class."
+            )
         messages = "\n"
         for route, (description, example) in route_messages.items():
             messages += f"{route}\n{description}\n(Example: {example})\n"

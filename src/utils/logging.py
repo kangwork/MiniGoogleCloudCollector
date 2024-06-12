@@ -1,5 +1,6 @@
 import logging
 
+
 # A class to log messages
 class Logger:
     """
@@ -12,21 +13,24 @@ class Logger:
     - _stream_handler: logging.StreamHandler, the stream handler
     - _formatter: logging.Formatter, the formatter
     """
+
     def __init__(self, name: str = "MiniGoogleCloudCollector"):
         self._logger = logging.getLogger(name)
         self._logger.setLevel(logging.INFO)
-        self._formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        self._formatter = logging.Formatter(
+            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+        )
         self._file_handler = None
         self._stream_handler = None
         return
-    
+
     def set_file_handler(self, log_file: str):
         # File Handler(For File Output)
         self._file_handler = logging.FileHandler(log_file)
         self._file_handler.setFormatter(self._formatter)
         self._logger.addHandler(self._file_handler)
         return
-    
+
     def set_stream_handler(self):
         # Stream Handler(For Console Output)
         self._stream_handler = logging.StreamHandler()
@@ -59,8 +63,8 @@ def setup_logger(logger: Logger, to_file: bool) -> None:
 
     else:
         logger.set_stream_handler()
-        
-    return 
+
+    return
 
 
 def setup_main_file_logger(logger: Logger) -> None:
@@ -79,7 +83,9 @@ def get_sub_file_logger(module_name: str = __name__) -> Logger:
     """
     Get the logger for the sub files
     """
-    logger = Logger(module_name) # name of the caller? or name of this file? --> name of the caller
+    logger = Logger(
+        module_name
+    )  # name of the caller? or name of this file? --> name of the caller
     # DO NOT clear the log file, but append to it
     setup_logger(logger, to_file=True)
     return logger
@@ -89,6 +95,8 @@ def get_console_logger(module_name: str = __name__) -> Logger:
     """
     Get the logger for the console
     """
-    logger = Logger(module_name) # name of the caller? or name of this file? --> name of the caller
+    logger = Logger(
+        module_name
+    )  # name of the caller? or name of this file? --> name of the caller
     setup_logger(logger, to_file=False)
     return logger
