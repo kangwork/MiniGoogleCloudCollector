@@ -15,5 +15,11 @@ def get_credentials() -> Credentials:
             "GOOGLE_APPLICATION_CREDENTIALS environment variable is not set."
         )
 
-    credentials = Credentials.from_service_account_file(credentials_path)
+    try:
+        credentials = Credentials.from_service_account_file(credentials_path)
+
+    except Exception as e:
+        raise Exception(
+            f"Current Path: {os.getcwd()}\nCredentials Path: {credentials_path}\nError: {str(e)}"
+        )
     return credentials

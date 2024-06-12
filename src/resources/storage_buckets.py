@@ -1,5 +1,4 @@
 from google.cloud import storage
-from utils.logging import get_console_logger
 from utils.resource import Resource
 from google.cloud.storage.bucket import Bucket
 from utils.collector import Collector

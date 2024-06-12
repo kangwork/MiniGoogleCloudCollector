@@ -1,5 +1,4 @@
 from google.cloud import iam_admin_v1 as iam
-from utils.logging import get_console_logger
 from utils.resource import Resource
 from utils.collector import Collector
 from utils.decorators import error_handler_decorator
