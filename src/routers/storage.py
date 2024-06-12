@@ -32,7 +32,7 @@ def list_storage_buckets():
         )
         return JSONResponse(
             content={"data": "", "message": "Failed to retrieve the storage buckets."},
-            status_code=e.code,
+            status_code=getattr(e, "code", 500),
         )
 
 
@@ -56,5 +56,5 @@ def get_storage_bucket(bucket_name: str):
         )
         return JSONResponse(
             content={"data": "", "message": "Failed to retrieve the storage bucket."},
-            status_code=e.code,
+            status_code=getattr(e, "code", 500),
         )

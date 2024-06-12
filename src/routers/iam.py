@@ -27,7 +27,8 @@ def list_iam_roles():
         logger.add_error("list_iam_roles(): Failed to retrieve the IAM roles.")
         return JSONResponse(
             content={"data": "", "message": "Failed to retrieve the IAM roles."},
-            status_code=e.code,
+            # in case there is no error code, set the status code to 500. We will use get_status_code() in the future.
+            status_code=getattr(e, "code", 500),
         )
 
 
@@ -50,5 +51,5 @@ def get_iam_role(role_id: int):
         logger.add_error(f"get_iam_role(role_id={role_id}): {str(e)}")
         return JSONResponse(
             content={"data": "", "message": "Failed to retrieve the IAM role."},
-            status_code=e.code,
+            status_code=getattr(e, "code", 500),
         )

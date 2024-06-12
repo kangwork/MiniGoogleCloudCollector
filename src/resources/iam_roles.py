@@ -1,36 +1,8 @@
 from google.cloud import iam_admin_v1 as iam
-from utils.resource import Resource
 from utils.collector import Collector
 from utils.decorators import error_handler_decorator
+from models.iam_role import IAMRole
 
-
-# ==========================================================================
-# Resource class
-class Role(Resource):
-    """
-    A class to represent a Role
-
-    Attributes:
-    - name: str, the role name
-    - title: str, the role title
-    - description: str, the role description
-    - stage: str, the role stage
-    - included_permissions: list, the role's included permissions
-    """
-
-    def __init__(self, resource: dict):
-        super().__init__(resource)
-        self.name = resource.name
-        self.title = resource.title
-        self.description = resource.description
-        self.stage = resource.stage
-        self.included_permissions = resource.included_permissions
-
-    def __str__(self):
-        """
-        Simplify the object representation for listing (role id)
-        """
-        return self.name
 
 
 # ==========================================================================
@@ -50,7 +22,7 @@ class IAMRoleCollector(Collector):
         return super().get_route_messages(route_messages)
 
     @error_handler_decorator
-    def collect_resource(self, role_id: int) -> Role:
+    def collect_resource(self, role_id: int) -> IAMRole:
         """
         Get a role's details
 
@@ -61,10 +33,10 @@ class IAMRoleCollector(Collector):
         client = iam.IAMClient(credentials=self.credentials)
         request = iam.GetRoleRequest(name=role_name)
         response = client.get_role(request=request)
-        return Role(response)
-
+        return IAMRole.from_gcp_resource(response)
+    
     @error_handler_decorator
-    def collect_resources(self) -> list[Role]:
+    def collect_resources(self) -> list[IAMRole]:
         """
         Get all roles in a project
 
@@ -75,7 +47,7 @@ class IAMRoleCollector(Collector):
         client = iam.IAMClient(credentials=self.credentials)
         request = iam.ListRolesRequest(parent=f"projects/{self.project_id}")
         response = client.list_roles(request=request)
-        roles = [Role(role) for role in response.roles]
+        roles = [IAMRole.from_gcp_resource(role) for role in response.roles]
         return roles
 
     def __str__(self):

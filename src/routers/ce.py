@@ -32,7 +32,7 @@ def list_ce_instances():
                 "data": "",
                 "message": "Failed to retrieve the Compute Engine instances.",
             },
-            status_code=e.code,
+            status_code=getattr(e, "code", 500),
         )
 
 
@@ -61,7 +61,7 @@ def list_ce_instances_in_zone(zone: str):
                 "data": "",
                 "message": f"Failed to retrieve the Compute Engine instances in {zone}.",
             },
-            status_code=e.code,
+            status_code=getattr(e, "code", 500),
         )
 
 
@@ -87,5 +87,5 @@ def get_ce_instance(zone: str, instance_name: str):
                 "data": "",
                 "message": "Failed to retrieve the Compute Engine instance.",
             },
-            status_code=e.code,
+            status_code=getattr(e, "code", 500),
         )
