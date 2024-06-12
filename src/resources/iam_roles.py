@@ -76,12 +76,3 @@ class IAMRoleCollector(Collector):
         return roles
 
 
-# ==========================================================================
-# Main function
-if __name__ == "__main__":
-    logger = get_console_logger()
-    logger.add_warning("This app cannot be run directly. Please run the main.py file.")
-    logger.add_info("Exiting.")
-    exit()
-
-

@@ -105,12 +105,3 @@ class VMInstanceCollector(Collector):
         for instance in instance_client.list(request=request):
             instances.append(VMInstance(instance))
         return instances
-
-
-# =============================================================================
-# Main function
-if __name__ == '__main__':
-    logger = get_console_logger()
-    logger.add_warning("This app cannot be run directly. Please run the main.py file.")
-    logger.add_info("Exiting.")
-    exit(0)
