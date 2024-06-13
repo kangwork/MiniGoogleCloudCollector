@@ -33,7 +33,7 @@ class IAMRoleCollector(Collector):
         client = iam.IAMClient(credentials=self.credentials)
         request = iam.GetRoleRequest(name=role_name)
         response = client.get_role(request=request)
-        return IAMRole.from_gcp_resource(response)
+        return IAMRole.from_gcp_object(response)
 
     @error_handler_decorator
     def collect_resources(self) -> list[IAMRole]:
@@ -47,7 +47,7 @@ class IAMRoleCollector(Collector):
         client = iam.IAMClient(credentials=self.credentials)
         request = iam.ListRolesRequest(parent=f"projects/{self.project_id}")
         response = client.list_roles(request=request)
-        roles = [IAMRole.from_gcp_resource(role) for role in response.roles]
+        roles = [IAMRole.from_gcp_object(role) for role in response.roles]
         return roles
 
     def __str__(self):

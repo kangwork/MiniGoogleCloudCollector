@@ -3,37 +3,7 @@ from utils.resource import Resource
 from google.cloud.storage.bucket import Bucket
 from collectors.collector import Collector
 from utils.decorators import error_handler_decorator
-
-
-# ==========================================================================
-# Resource class
-class StorageBucket(Resource):
-    """
-    A class to represent a Storage Bucket
-
-    Attributes:
-    - name: str, the bucket name
-    - location: str, the bucket location
-    - storage_class: str, the bucket storage class
-    - lifecycle_rules: list, the bucket lifecycle rules
-    - labels: dict, the bucket labels
-    - created: datetime, the bucket creation time
-    """
-
-    def __init__(self, resource: Bucket):
-        super().__init__(resource.__dict__)
-        self.name = resource.name
-        self.location = resource.location
-        self.storage_class = resource.storage_class
-        self.lifecycle_rules = resource.lifecycle_rules
-        self.labels = resource.labels
-        self.created = resource.time_created
-
-    def __str__(self):
-        """
-        Simplify the object representation for listing (bucket name)
-        """
-        return self.name
+from models.storage_bucket import StorageBucket
 
 
 # =============================================================================
@@ -63,7 +33,7 @@ class StorageBucketCollector(Collector):
         )
         buckets = []
         for bucket in storage_client.list_buckets():
-            buckets.append(StorageBucket(bucket))
+            buckets.append(StorageBucket.from_gcp_object(bucket))
         return buckets
 
     @error_handler_decorator
@@ -71,5 +41,5 @@ class StorageBucketCollector(Collector):
         storage_client = storage.Client(
             credentials=self.credentials, project=self.project_id
         )
-        bucket = StorageBucket(storage_client.get_bucket(bucket_name))
+        bucket = StorageBucket.from_gcp_object(storage_client.get_bucket(bucket_name))
         return bucket

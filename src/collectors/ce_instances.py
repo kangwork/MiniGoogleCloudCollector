@@ -2,41 +2,7 @@ from google.cloud import compute_v1
 from utils.resource import Resource
 from collectors.collector import Collector
 from utils.decorators import error_handler_decorator
-
-
-# ==========================================================================
-# Resource class
-class CEInstance(Resource):
-    """
-    A class to represent a CE(Compute Engine) Instance
-
-    Attributes:
-    - name: str, the instance name
-    - zone: str, the instance zone
-    - machine_type: str, the instance machine type
-    - status: str, the instance status
-    - creation_time: datetime, the instance creation time
-    - disks: list, the instance disks
-    - network_interfaces: list, the instance network interfaces
-    - metadata: dict, the instance metadata
-    """
-
-    def __init__(self, resource: dict):
-        super().__init__(resource)
-        self.name = resource.name
-        self.zone = resource.zone
-        self.machine_type = resource.machine_type
-        self.status = resource.status
-        self.creation_time = resource.creation_timestamp
-        self.disks = resource.disks
-        self.network_interfaces = resource.network_interfaces
-        self.metadata = resource.metadata
-
-    def __str__(self):
-        """
-        Simplify the object representation for listing (instance name)
-        """
-        return f"Zone: {self.zone}, Name: {self.name}"
+from models.ce_instance import CEInstance
 
 
 # =============================================================================
@@ -83,7 +49,8 @@ class CEInstanceCollector(Collector):
                 continue
             else:
                 all_instances.extend(
-                    CEInstance(instance) for instance in instances_scoped_list.instances
+                    CEInstance.from_gcp_object(instance)
+                    for instance in instances_scoped_list.instances
                 )
 
         return all_instances
@@ -103,7 +70,7 @@ class CEInstanceCollector(Collector):
         request = compute_v1.GetInstanceRequest(
             project=self.project_id, zone=zone, instance=instance_name
         )
-        return CEInstance(instance_client.get(request=request))
+        return CEInstance.from_gcp_object(instance_client.get(request=request))
 
     @error_handler_decorator
     def collect_resources_in_zone(self, zone: str) -> list[CEInstance]:
@@ -119,5 +86,5 @@ class CEInstanceCollector(Collector):
         request = compute_v1.ListInstancesRequest(project=self.project_id, zone=zone)
         instances = []
         for instance in instance_client.list(request=request):
-            instances.append(CEInstance(instance))
+            instances.append(CEInstance.from_gcp_object(instance))
         return instances
