@@ -43,3 +43,6 @@ class StorageBucket(BaseModel):
             DefaultObjectACL: lambda v: v.__dict__,
             Client: lambda v: v.__dict__,
         }
+
+    def __str__(self):
+        return self.name
