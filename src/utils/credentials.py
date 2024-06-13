@@ -2,7 +2,6 @@ import os
 from google.oauth2.service_account import Credentials
 from utils.logging import get_sub_file_logger
 
-
 # A function to get credentials.
 def get_credentials() -> Credentials:
     credentials_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
@@ -23,3 +22,5 @@ def get_credentials() -> Credentials:
             f"Current Path: {os.getcwd()}\nCredentials Path: {credentials_path}\nError: {str(e)}"
         )
     return credentials
+
+credentials = get_credentials()

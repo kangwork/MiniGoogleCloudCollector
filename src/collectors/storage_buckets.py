@@ -41,5 +41,6 @@ class StorageBucketCollector(Collector):
         storage_client = storage.Client(
             credentials=self.credentials, project=self.project_id
         )
-        bucket = StorageBucket.from_gcp_object(storage_client.get_bucket(bucket_name))
+        bucket_resource = storage_client.get_bucket(bucket_name)
+        bucket = StorageBucket.from_gcp_object(bucket_resource)
         return bucket

@@ -1,27 +1,25 @@
 import os
 from fastapi import FastAPI, Request
-from utils.logging import (
-    get_console_logger,
-    get_sub_file_logger,
-)
+from fastapi.responses import JSONResponse
+from utils.credentials import credentials
+from routers.iam import IAMRouter
+from routers.storage import StorageRouter
+from routers.ce import CERouter
+from utils.logging import get_sub_file_logger, get_console_logger
 from collectors.storage_buckets import StorageBucketCollector
 from collectors.iam_roles import IAMRoleCollector
 from collectors.ce_instances import CEInstanceCollector
-from fastapi.responses import JSONResponse
-from utils.credentials import get_credentials
-from routers.iam import iam as IAMRouter
-from routers.storage import storage as StorageRouter
-from routers.ce import ce as CERouter
 
 # A main program to call all the api functions
 # =============================================================================
 # 0. Setup (Create a FastAPI app, a logger, and templates)
 app = FastAPI()
 logger = get_sub_file_logger(__name__)
-credentials = get_credentials()
+# How do we make each router use the credentials value? We will pass the credentials to each router.
 app.include_router(IAMRouter)
 app.include_router(StorageRouter)
 app.include_router(CERouter)
+
 
 
 # =============================================================================
@@ -40,7 +38,7 @@ def read_root(request: Request):
         logger.add_error(f"read_root(): {str(e)}")
         return JSONResponse(
             content={"data": "", "message": "Failed to retrieve the route messages."},
-            status_code=e.code,
+            status_code=getattr(e, "code", 500),
         )
 
 
@@ -76,7 +74,7 @@ def list_all_resources():
         logger.add_error(f"list_all_resources(): {str(e)}")
         return JSONResponse(
             content={"data": "", "message": "Failed to retrieve all resources."},
-            status_code=e.code,
+            status_code=getattr(e, "code", 500),
         )
 
 
@@ -92,6 +90,14 @@ if __name__ == "__main__":
     - Press Ctrl+C to stop the app.
     """
     console_logger.add_info(instruction)
-
+    # If the current path is MiniGoogleCloudCollector/src, the command will be executed successfully.
+    # If the current path is MiniGoogleCloudCollector, the command will not be executed successfully. We need to change the path to MiniGoogleCloudCollector/src.
+    # if os.getcwd().endswith("MiniGoogleCloudCollector"):
+    #     os.system("uvicorn src.main:app --reload")
+    # elif os.getcwd().endswith("src"):
     os.system("uvicorn main:app --reload")
+    # else:
+    #     console_logger.add_error(
+    #         "Please change the path to MiniGoogleCloudCollector/ or MiniGoogleCloudCollector/src/ to run the app."
+    #     )
     # uvicorn.run("main:app", host='0.0.0.0', port=8000, --reload)

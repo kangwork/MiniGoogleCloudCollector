@@ -1,25 +1,23 @@
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
-from utils.credentials import get_credentials
 from utils.logging import get_sub_file_logger
 from collectors.ce_instances import CEInstanceCollector
+from utils.credentials import credentials
 
-ce = APIRouter(prefix="/ce", tags=["Compute Engine"])
+CERouter = APIRouter(prefix="/ce", tags=["Compute Engine"])
 logger = get_sub_file_logger(__name__)
-credentials = get_credentials()
 
 
 # 2-4-1. A route to list all Compute Engine instances in a project
 # Example use: http://localhost/ce/instances/us-west1-b
-@ce.get("/instances")
+@CERouter.get("/instances")
 def list_ce_instances():
     try:
         logger.add_info("list_ce_instances(): The list_ce_instances route is accessed.")
         vic = CEInstanceCollector(credentials)
         resources = vic.collect_resources()
-        simplified_resources = [str(resource) for resource in resources]
         return {
-            "data": simplified_resources,
+            "data": [resource.__repr__() for resource in resources],
             "length": len(resources),
             "message": "List of all Compute Engine instances in the project.",
         }
@@ -38,7 +36,7 @@ def list_ce_instances():
 
 # 2-4-2. A route to list all Compute Engine instances in a project in a specific zone
 # Example use: http://localhost/ce/instances/us-west1-b
-@ce.get("/instances/{zone}")
+@CERouter.get("/instances/{zone}")
 def list_ce_instances_in_zone(zone: str):
     try:
         logger.add_info(
@@ -46,9 +44,8 @@ def list_ce_instances_in_zone(zone: str):
         )
         vic = CEInstanceCollector(credentials)
         resources = vic.collect_resources_in_zone(zone)
-        simplified_resources = [str(resource) for resource in resources]
         return {
-            "data": simplified_resources,
+            "data": [resource.__repr__() for resource in resources],
             "length": len(resources),
             "message": f"List of all Compute Engine instances in the project in {zone}.",
         }
@@ -66,7 +63,7 @@ def list_ce_instances_in_zone(zone: str):
 
 
 # 2-4-3. A route to get details of a specific Compute Engine instance
-@ce.get("/instances/{zone}/{instance_name}")
+@CERouter.get("/instances/{zone}/{instance_name}")
 def get_ce_instance(zone: str, instance_name: str):
     try:
         logger.add_info(

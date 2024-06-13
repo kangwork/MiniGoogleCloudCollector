@@ -1,15 +1,15 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
-from utils.credentials import get_credentials
 from utils.logging import get_sub_file_logger
 from collectors.iam_roles import IAMRoleCollector
+from utils.credentials import credentials
 
-iam = APIRouter(prefix="/iam", tags=["IAM"])
+
+IAMRouter = APIRouter(prefix="/iam", tags=["IAM"])
 logger = get_sub_file_logger(__name__)
-credentials = get_credentials()
 
 
-@iam.get("/roles")
+@IAMRouter.get("/roles")
 # 2-3-1. A route to list all IAM roles in a project
 # Example use: http://localhost/iam/roles
 def list_iam_roles():
@@ -17,9 +17,8 @@ def list_iam_roles():
         logger.add_info("list_iam_roles(): The list_iam_roles route is accessed.")
         irc = IAMRoleCollector(credentials)
         resources = irc.collect_resources()
-        simplified_resources = [str(resource) for resource in resources]
         return {
-            "data": simplified_resources,
+            "data": [resource.__repr__() for resource in resources],
             "length": len(resources),
             "message": "List of all IAM roles in the project.",
         }
@@ -35,7 +34,7 @@ def list_iam_roles():
 # 2-3-2. A route to get details of a specific IAM role
 # Example use: http://localhost/iam/roles/609
 # Example use: http://localhost/iam/roles/261
-@iam.get("/roles/{role_id}")
+@IAMRouter.get("/roles/{role_id}")
 def get_iam_role(role_id: int):
     try:
         logger.add_info(

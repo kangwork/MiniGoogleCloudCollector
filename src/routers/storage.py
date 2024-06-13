@@ -1,18 +1,18 @@
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
-from utils.credentials import get_credentials
 from utils.logging import get_sub_file_logger
 from collectors.storage_buckets import StorageBucketCollector
+from utils.credentials import credentials
 
-storage = APIRouter(prefix="/storage", tags=["Storage"])
+
+StorageRouter = APIRouter(prefix="/storage", tags=["Storage"])
 logger = get_sub_file_logger(__name__)
-credentials = get_credentials()
 
 
 ### 2-2. Storage Bucket APIs
 # Example use: http://localhost/storage/buckets/airbyte_testing_001
 # 2-2-1. A route to list all storage buckets in a project
-@storage.get("/buckets")
+@StorageRouter.get("/buckets")
 def list_storage_buckets():
     try:
         logger.add_info(
@@ -20,9 +20,8 @@ def list_storage_buckets():
         )
         sbc = StorageBucketCollector(credentials)
         resources = sbc.collect_resources()
-        simplified_resources = [str(resource) for resource in resources]
         return {
-            "data": simplified_resources,
+            "data": [resource.__repr__() for resource in resources],
             "length": len(resources),
             "message": "List of all storage buckets in the project.",
         }
@@ -38,7 +37,7 @@ def list_storage_buckets():
 
 # Example use: http://localhost/storage/buckets/airbyte_testing_001
 # 2-2-2. A route to get a storage bucket's details
-@storage.get("/buckets/{bucket_name}")
+@StorageRouter.get("/buckets/{bucket_name}")
 def get_storage_bucket(bucket_name: str):
     try:
         logger.add_info(
