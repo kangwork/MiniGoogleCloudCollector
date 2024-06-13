@@ -85,9 +85,12 @@ def get_sub_file_logger(module_name: str = __name__) -> Logger:
     """
     logger = Logger(
         module_name
-    )  # name of the caller? or name of this file? --> name of the caller
-    # DO NOT clear the log file, but append to it
+    )
     setup_logger(logger, to_file=True)
+    if module_name == "main":
+        with open("log.log", "w") as f:
+            f.write("")
+            logger.add_info("Starting the main program.")
     return logger
 
 

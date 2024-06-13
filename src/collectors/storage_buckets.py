@@ -2,7 +2,7 @@ from google.cloud import storage
 from utils.resource import Resource
 from google.cloud.storage.bucket import Bucket
 from collectors.collector import Collector
-from utils.decorators import error_handler_decorator
+from utils.decorators import method_error_handler_decorator
 from models.storage_bucket import StorageBucket
 
 
@@ -26,7 +26,7 @@ class StorageBucketCollector(Collector):
         }
         return super().get_route_messages(route_messages)
 
-    @error_handler_decorator
+    @method_error_handler_decorator
     def collect_resources(self) -> list[StorageBucket]:
         storage_client = storage.Client(
             credentials=self.credentials, project=self.project_id
@@ -36,7 +36,7 @@ class StorageBucketCollector(Collector):
             buckets.append(StorageBucket.from_gcp_object(bucket))
         return buckets
 
-    @error_handler_decorator
+    @method_error_handler_decorator
     def collect_resource(self, bucket_name: str) -> StorageBucket:
         storage_client = storage.Client(
             credentials=self.credentials, project=self.project_id
