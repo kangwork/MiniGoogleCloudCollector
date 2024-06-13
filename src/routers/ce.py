@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 from utils.credentials import get_credentials
 from utils.logging import get_sub_file_logger
-from resources.ce_instances import CEInstanceCollector
+from collectors.ce_instances import CEInstanceCollector
 
 ce = APIRouter(prefix="/ce", tags=["Compute Engine"])
 logger = get_sub_file_logger(__name__)

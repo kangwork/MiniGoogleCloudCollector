@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 from utils.credentials import get_credentials
 from utils.logging import get_sub_file_logger
-from resources.iam_roles import IAMRoleCollector
+from collectors.iam_roles import IAMRoleCollector
 
 iam = APIRouter(prefix="/iam", tags=["IAM"])
 logger = get_sub_file_logger(__name__)

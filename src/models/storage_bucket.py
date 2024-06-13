@@ -7,6 +7,7 @@ class StorageBucket(BaseModel):
     """
     Model for a storage bucket
     """
+
     name: str
     _properties: dict
     _changes: set

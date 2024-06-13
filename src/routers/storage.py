@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from fastapi.responses import JSONResponse
 from utils.credentials import get_credentials
 from utils.logging import get_sub_file_logger
-from resources.storage_buckets import StorageBucketCollector
+from collectors.storage_buckets import StorageBucketCollector
 
 storage = APIRouter(prefix="/storage", tags=["Storage"])
 logger = get_sub_file_logger(__name__)

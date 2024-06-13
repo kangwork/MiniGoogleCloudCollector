@@ -4,9 +4,9 @@ from utils.logging import (
     get_console_logger,
     get_sub_file_logger,
 )
-from resources.storage_buckets import StorageBucketCollector
-from resources.iam_roles import IAMRoleCollector
-from resources.ce_instances import CEInstanceCollector
+from collectors.storage_buckets import StorageBucketCollector
+from collectors.iam_roles import IAMRoleCollector
+from collectors.ce_instances import CEInstanceCollector
 from fastapi.responses import JSONResponse
 from utils.credentials import get_credentials
 from routers.iam import iam as IAMRouter
@@ -32,12 +32,9 @@ def read_root(request: Request):
     try:
         logger.add_info("read_root(): The root route is accessed.")
         message = "Welcome to the Mini Google Cloud Collector!\n\nAvailable routes:\n"
-        sbc = StorageBucketCollector()
-        irc = IAMRoleCollector()
-        cic = CEInstanceCollector()
-        message += sbc.get_route_messages()
-        message += irc.get_route_messages()
-        message += cic.get_route_messages()
+        message += StorageBucketCollector.get_route_messages()
+        message += IAMRoleCollector.get_route_messages()
+        message += CEInstanceCollector.get_route_messages()
         return {"data": "", "message": message}
     except Exception as e:
         logger.add_error(f"read_root(): {str(e)}")
