@@ -1,6 +1,6 @@
 from google.cloud import compute_v1
 from utils.resource import Resource
-from utils.collector import Collector
+from collectors.collector import Collector
 from utils.decorators import error_handler_decorator
 
 
@@ -45,6 +45,7 @@ class CEInstanceCollector(Collector):
     def __init__(self, credentials=None):
         super().__init__(__name__, credentials)
 
+    @classmethod
     def get_route_messages(self) -> str:
         route_messages = {
             "/ce/instances": (
