@@ -11,8 +11,7 @@ $(requirements_stamp): $(requirements) $(venv)
 	touch $(requirements_stamp);
 
 activate: $(venv)
-	echo "source $(venv)/bin/activate";
-
+	@echo "Activate your venv by running 'source $(venv)/bin/activate'";
 
 run: main.py $(shell find . -name "*.py") activate $(requirements_stamp) 
 	python main.py;
