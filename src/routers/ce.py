@@ -4,6 +4,7 @@ from utils.logging import get_sub_file_logger
 from collectors.ce_instances import CEInstanceCollector
 from utils.credentials import credentials
 from utils.decorators import func_error_handler_decorator
+from models.response import APIResponse
 
 CERouter = APIRouter(prefix="/ce", tags=["Compute Engine"])
 logger = get_sub_file_logger(__name__)
@@ -11,7 +12,7 @@ logger = get_sub_file_logger(__name__)
 
 # 2-4-1. A route to list all Compute Engine instances in a project
 # Example use: http://localhost/ce/instances/us-west1-b
-@CERouter.get("/instances")
+@CERouter.get("/instances", response_model=APIResponse)
 @func_error_handler_decorator(logger=logger, is_api=True)
 def list_ce_instances():
     logger.add_info("list_ce_instances(): The list_ce_instances route is accessed.")
@@ -19,14 +20,13 @@ def list_ce_instances():
     resources = vic.collect_resources()
     return {
         "data": [resource.__repr__() for resource in resources],
-        "length": len(resources),
         "message": "List of all Compute Engine instances in the project.",
     }
 
 
 # 2-4-2. A route to list all Compute Engine instances in a project in a specific zone
 # Example use: http://localhost/ce/instances/us-west1-b
-@CERouter.get("/instances/{zone}")
+@CERouter.get("/instances/{zone}", response_model=APIResponse)
 @func_error_handler_decorator(logger=logger, is_api=True)
 def list_ce_instances_in_zone(zone: str):
     logger.add_info(
@@ -36,13 +36,12 @@ def list_ce_instances_in_zone(zone: str):
     resources = vic.collect_resources_in_zone(zone)
     return {
         "data": [resource.__repr__() for resource in resources],
-        "length": len(resources),
         "message": f"List of all Compute Engine instances in the project in {zone}.",
     }
 
 
 # 2-4-3. A route to get details of a specific Compute Engine instance
-@CERouter.get("/instances/{zone}/{instance_name}")
+@CERouter.get("/instances/{zone}/{instance_name}", response_model=APIResponse)
 @func_error_handler_decorator(logger=logger, is_api=True)
 def get_ce_instance(zone: str, instance_name: str):
     logger.add_info(

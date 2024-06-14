@@ -4,6 +4,7 @@ from utils.logging import get_sub_file_logger
 from collectors.storage_buckets import StorageBucketCollector
 from utils.credentials import credentials
 from utils.decorators import func_error_handler_decorator
+from models.response import APIResponse
 
 
 StorageRouter = APIRouter(prefix="/storage", tags=["Storage"])
@@ -13,7 +14,7 @@ logger = get_sub_file_logger(__name__)
 ### 2-2. Storage Bucket APIs
 # Example use: http://localhost/storage/buckets/airbyte_testing_001
 # 2-2-1. A route to list all storage buckets in a project
-@StorageRouter.get("/buckets")
+@StorageRouter.get("/buckets", response_model=APIResponse)
 @func_error_handler_decorator(logger=logger, is_api=True)
 def list_storage_buckets():
     logger.add_info(
@@ -23,14 +24,13 @@ def list_storage_buckets():
     resources = sbc.collect_resources()
     return {
         "data": [resource.__repr__() for resource in resources],
-        "length": len(resources),
         "message": "List of all storage buckets in the project.",
     }
 
 
 # Example use: http://localhost/storage/buckets/airbyte_testing_001
 # 2-2-2. A route to get a storage bucket's details
-@StorageRouter.get("/buckets/{bucket_name}")
+@StorageRouter.get("/buckets/{bucket_name}", response_model=APIResponse)
 @func_error_handler_decorator(logger=logger, is_api=True)
 def get_storage_bucket(bucket_name: str):
     logger.add_info(

@@ -10,6 +10,7 @@ from collectors.storage_buckets import StorageBucketCollector
 from collectors.iam_roles import IAMRoleCollector
 from collectors.ce_instances import CEInstanceCollector
 from utils.decorators import func_error_handler_decorator
+from models.response import APIResponse
 
 # A main program to call all the api functions
 # =============================================================================
@@ -24,7 +25,7 @@ app.include_router(CERouter)
 # =============================================================================
 # 2. APIs (Define the routes)
 # 2-1. The root route
-@app.get("/")
+@app.get("/", response_model=APIResponse)
 @func_error_handler_decorator(logger=logger, is_api=True)
 def read_root(request: Request):
     logger.add_info("read_root(): The root route is accessed.")
@@ -38,7 +39,7 @@ def read_root(request: Request):
 ### 2-5. All Three at Once
 # 2-5-1. A route to list all resources in a project
 # Example use: http://localhost/all-resources
-@app.get("/all-resources")
+@app.get("/all-resources", response_model=APIResponse)
 @func_error_handler_decorator(logger=logger, is_api=True)
 def list_all_resources():
     logger.add_info("list_all_resources(): The list_all_resources route is accessed.")
@@ -50,13 +51,15 @@ def list_all_resources():
         "iam_roles": irc.collect_resources(),
         "ce_instances": cic.collect_resources(),
     }
-    simplified_resources = {
-        "storage_buckets": [str(resource) for resource in resources["storage_buckets"]],
-        "iam_roles": [str(resource) for resource in resources["iam_roles"]],
-        "ce_instances": [str(resource) for resource in resources["ce_instances"]],
+    repr_resources = {
+        "storage_buckets": [
+            repr(resource) for resource in resources["storage_buckets"]
+        ],
+        "iam_roles": [repr(resource) for resource in resources["iam_roles"]],
+        "ce_instances": [repr(resource) for resource in resources["ce_instances"]],
     }
     return {
-        "data": simplified_resources,
+        "data": repr_resources,
         "message": "List of all resources in the project.",
     }
 
