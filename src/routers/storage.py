@@ -1,5 +1,4 @@
 from fastapi import APIRouter
-from fastapi.responses import JSONResponse
 from utils.logging import get_sub_file_logger
 from collectors.storage_buckets import StorageBucketCollector
 from utils.credentials import credentials

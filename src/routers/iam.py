@@ -1,5 +1,4 @@
-from fastapi import APIRouter, Depends
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter
 from utils.logging import get_sub_file_logger
 from collectors.iam_roles import IAMRoleCollector
 from utils.credentials import credentials
