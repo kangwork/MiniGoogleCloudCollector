@@ -81,8 +81,5 @@ class CEInstance(BaseModel):
             zone=obj.zone,
         )
 
-    def __str__(self):
-        return f"Zone: {self.zone}, Name: {self.name}"
-
     class Config:
         arbitrary_types_allowed = True

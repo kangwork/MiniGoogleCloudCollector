@@ -25,6 +25,3 @@ class IAMRole(BaseModel):
             stage=obj.stage,
             etag=obj.etag,
         )
-
-    def __str__(self):
-        return self.name

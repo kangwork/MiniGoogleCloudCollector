@@ -39,11 +39,3 @@ class StorageBucket(BaseModel):
 
     class Config:
         arbitrary_types_allowed = True
-        json_encoders = {
-            BucketACL: lambda v: v.__dict__,
-            DefaultObjectACL: lambda v: v.__dict__,
-            Client: lambda v: v.__dict__,
-        }
-
-    def __str__(self):
-        return self.name
