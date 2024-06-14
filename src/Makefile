@@ -1,17 +1,24 @@
 # Makefile for the MiniGoogleCloudCollector project
-
 requirements = ../pkg/pip_requirements.txt
+venv = ../venv
+requirements_stamp = requirements.timestamp
 
-venv: $(requirements)
-	python -m venv venv
-	source venv/bin/activate
-	pip install -r $(requirements);
+$(venv):
+	python -m venv $(venv);
 
-# this should be run after the venv target
-run: main.py $(shell find . -name "*.py")
-	python main.py 'y';
+$(requirements_stamp): $(requirements) $(venv)
+	$(venv)/bin/pip install -r $(requirements)
+	touch $(requirements_stamp);
 
-.PHONY: clean
+activate: $(venv)
+	echo "source $(venv)/bin/activate";
+
+
+run: main.py $(shell find . -name "*.py") activate $(requirements_stamp) 
+	python main.py;
+
+.PHONY: clean activate
 
 clean:
 	find . -name "__pycache__" -exec rm -rf {} \;
+	rm -f $(requirements_stamp)

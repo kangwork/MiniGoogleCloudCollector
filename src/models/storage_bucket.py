@@ -10,6 +10,7 @@ class StorageBucket(BaseModel):
     """
     Model for a storage bucket
     """
+
     name: str
     properties: Dict[str, Any] = Field(default_factory=dict)
     changes: Set[str] = Field(default_factory=set)
@@ -35,7 +36,7 @@ class StorageBucket(BaseModel):
         )
 
         return classinstance
-    
+
     class Config:
         arbitrary_types_allowed = True
         json_encoders = {

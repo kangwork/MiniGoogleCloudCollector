@@ -17,7 +17,7 @@ Follow the instructions below to set up the GOOGLE_APPLICATION_CREDENTIALS envir
 1. Open a terminal.
 2. Run the following command:
    ```shell
-   export GOOGLE_APPLICATION_CREDENTIALS="../path/to/service/account/key.json"
+   export GOOGLE_APPLICATION_CREDENTIALS="path/to/service/account/key.json"
    ```
 3. Replace "../local/mini-collector/key.json" with the path to your credentials file.
 

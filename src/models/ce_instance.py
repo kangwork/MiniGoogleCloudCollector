@@ -13,6 +13,7 @@ from google.cloud.compute_v1.types import (
 )
 from typing import MutableSequence
 
+
 class CEInstance(BaseModel):
     """
     Model for a Compute Engine vm instance
@@ -82,6 +83,6 @@ class CEInstance(BaseModel):
 
     def __str__(self):
         return f"Zone: {self.zone}, Name: {self.name}"
-    
+
     class Config:
         arbitrary_types_allowed = True

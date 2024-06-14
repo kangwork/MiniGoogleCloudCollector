@@ -27,6 +27,7 @@ def list_storage_buckets():
         "message": "List of all storage buckets in the project.",
     }
 
+
 # Example use: http://localhost/storage/buckets/airbyte_testing_001
 # 2-2-2. A route to get a storage bucket's details
 @StorageRouter.get("/buckets/{bucket_name}")

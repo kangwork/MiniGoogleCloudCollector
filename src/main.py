@@ -21,7 +21,6 @@ app.include_router(StorageRouter)
 app.include_router(CERouter)
 
 
-
 # =============================================================================
 # 2. APIs (Define the routes)
 # 2-1. The root route
@@ -35,15 +34,14 @@ def read_root(request: Request):
     message += CEInstanceCollector.get_route_messages()
     return {"data": "", "message": message}
 
+
 ### 2-5. All Three at Once
 # 2-5-1. A route to list all resources in a project
 # Example use: http://localhost/all-resources
 @app.get("/all-resources")
 @func_error_handler_decorator(logger=logger, is_api=True)
 def list_all_resources():
-    logger.add_info(
-        "list_all_resources(): The list_all_resources route is accessed."
-    )
+    logger.add_info("list_all_resources(): The list_all_resources route is accessed.")
     sbc = StorageBucketCollector(credentials)
     irc = IAMRoleCollector(credentials)
     cic = CEInstanceCollector(credentials)
@@ -53,9 +51,7 @@ def list_all_resources():
         "ce_instances": cic.collect_resources(),
     }
     simplified_resources = {
-        "storage_buckets": [
-            str(resource) for resource in resources["storage_buckets"]
-        ],
+        "storage_buckets": [str(resource) for resource in resources["storage_buckets"]],
         "iam_roles": [str(resource) for resource in resources["iam_roles"]],
         "ce_instances": [str(resource) for resource in resources["ce_instances"]],
     }
@@ -63,6 +59,7 @@ def list_all_resources():
         "data": simplified_resources,
         "message": "List of all resources in the project.",
     }
+
 
 # =============================================================================
 # 3. Main function (Run the app)

@@ -83,9 +83,7 @@ def get_sub_file_logger(module_name: str = __name__) -> Logger:
     """
     Get the logger for the sub files
     """
-    logger = Logger(
-        module_name
-    )
+    logger = Logger(module_name)
     setup_logger(logger, to_file=True)
     if module_name == "main":
         with open("log.log", "w") as f:
