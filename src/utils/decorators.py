@@ -1,6 +1,7 @@
 import functools
 import inspect
 from models.response import APIResponse
+from fastapi.responses import JSONResponse
 
 
 def method_error_handler_decorator(method):
@@ -41,11 +42,12 @@ def func_error_handler_decorator(logger, is_api=False):
                 if not is_api:
                     raise e
                 else:
-                    return APIResponse(
-                        data="",
-                        message=f"Failed to retrieve data: {str(e)}",
-                        status_code=getattr(e, "status_code", 500),
-                    )
+                    api_response = {
+                        "data": "",
+                        "message": f"Failed to retrieve data: {str(e)}",
+                    }
+                    return JSONResponse(content=api_response, status_code=getattr(e, "code", 500))
+                        
 
         return wrapper
 

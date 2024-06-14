@@ -4,7 +4,6 @@ from pydantic import BaseModel
 class APIResponse(BaseModel):
     data: str | list | dict[str, list]
     length: int = -1
-    status_code: int = 200
     message: str = "Thanks for using the Mini Google Cloud Collector."
 
     def __init__(self, **data):
@@ -24,11 +23,4 @@ class APIResponse(BaseModel):
 
     class Config:
         arbitrary_types_allowed = True
-        json_schema_extra = {
-            "example": {
-                "data": "",
-                "length": 0,
-                "status_code": 200,
-                "message": "List of all resources in the project.",
-            }
-        }
+    
