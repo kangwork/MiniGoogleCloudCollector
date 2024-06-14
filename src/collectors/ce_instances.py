@@ -44,14 +44,10 @@ class CEInstanceCollector(Collector):
         for _, instances_scoped_list in instance_client.aggregated_list(
             project=self.project_id
         ):
-
-            if instances_scoped_list.warning:
-                continue
-            else:
-                all_instances.extend(
-                    CEInstance.from_gcp_object(instance)
-                    for instance in instances_scoped_list.instances
-                )
+            all_instances.extend(
+                CEInstance.from_gcp_object(instance)
+                for instance in instances_scoped_list.instances
+            )
 
         return all_instances
 
