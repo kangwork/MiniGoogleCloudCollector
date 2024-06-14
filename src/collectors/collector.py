@@ -1,8 +1,9 @@
 from utils.logging import Logger, get_sub_file_logger
 from google.oauth2.service_account import Credentials
+from abc import ABC, abstractmethod
 
 
-class Collector:
+class Collector(ABC):
     """
     A class to represent a Collector
 
@@ -41,14 +42,16 @@ class Collector:
             messages += f"{route}\n{description}\n(Example: {example})\n"
         return messages
 
+    @abstractmethod
     def collect_resources(self):
         """
         Collect all resources in the project
         """
-        raise NotImplementedError
+        pass
 
+    @abstractmethod
     def collect_resource(self, *args):
         """
         Collect a specific resource with the given arguments
         """
-        raise NotImplementedError
+        pass
