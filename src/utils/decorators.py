@@ -46,8 +46,9 @@ def func_error_handler_decorator(logger, is_api=False):
                         "data": "",
                         "message": f"Failed to retrieve data: {str(e)}",
                     }
-                    return JSONResponse(content=api_response, status_code=getattr(e, "code", 500))
-                        
+                    return JSONResponse(
+                        content=api_response, status_code=getattr(e, "code", 500)
+                    )
 
         return wrapper
 

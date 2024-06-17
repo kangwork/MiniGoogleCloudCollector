@@ -24,21 +24,44 @@ app.include_router(CERouter)
 # =============================================================================
 # 1. Credentials (Load the credentials)  --> This part will be moved to a separate module or credentials.py
 # ROUGH PLANNING FOR THE CREDENTIALS RETRIEVAL VIA PARAMETERS
-credential_fields = ["type", "project_id", "private_key_id", "private_key", "client_email", "client_id",
-                      "auth_uri", "token_uri", "auth_provider_x509_cert_url", "client_x509_cert_url"]
+credential_fields = [
+    "type",
+    "project_id",
+    "private_key_id",
+    "private_key",
+    "client_email",
+    "client_id",
+    "auth_uri",
+    "token_uri",
+    "auth_provider_x509_cert_url",
+    "client_x509_cert_url",
+]
+
 
 def _get_missing_fields(service_account_info: dict) -> list[str]:
-    logger.add_info(f"_get_missing_fields(): service_account_info: {service_account_info}")
-    missing_fields = [field for field in credential_fields if field not in service_account_info]
+    logger.add_info(
+        f"_get_missing_fields(): service_account_info: {service_account_info}"
+    )
+    missing_fields = [
+        field for field in credential_fields if field not in service_account_info
+    ]
     return missing_fields
 
-async def get_credentials(service_account_info: Annotated[dict | None, Body()] = None) -> Credentials:
+
+async def get_credentials(
+    service_account_info: Annotated[dict | None, Body()] = None
+) -> Credentials:
     if not service_account_info:
         raise ValueError("No service account info is provided.", 401)
     if _get_missing_fields(service_account_info):
-        raise ValueError(f"Missing credentials fields: {_get_missing_fields(service_account_info)}", 401)
+        raise ValueError(
+            f"Missing credentials fields: {_get_missing_fields(service_account_info)}",
+            401,
+        )
     credentials = Credentials.from_service_account_info(service_account_info)
     return credentials
+
+
 # =============================================================================
 # 2. APIs (Define the routes)
 # 2-1. The root route
@@ -51,7 +74,6 @@ def read_root(request: Request):
     message += IAMRoleCollector.get_route_messages()
     message += CEInstanceCollector.get_route_messages()
     return {"data": "", "message": message}
-
 
 
 ### 2-5. All Three at Once
@@ -80,6 +102,7 @@ def list_all_resources(credentials: Credentials = Depends(get_credentials)):
         "data": repr_resources,
         "message": "List of all resources in the project.",
     }
+
 
 # =============================================================================
 # 3. Main function (Run the app)
