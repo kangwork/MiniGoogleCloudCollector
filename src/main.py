@@ -1,5 +1,5 @@
 import os
-from fastapi import FastAPI, Request, Header, Depends, Body, Query
+from fastapi import FastAPI, Depends
 from routers.iam import IAMRouter
 from routers.storage import StorageRouter
 from routers.ce import CERouter
@@ -9,8 +9,7 @@ from collectors.iam_roles import IAMRoleCollector
 from collectors.ce_instances import CEInstanceCollector
 from utils.decorators import func_error_handler_decorator
 from models.response import APIResponse
-from google.oauth2.service_account import Credentials
-from typing import Annotated
+from utils.credentials import get_credentials
 
 # A main program to call all the api functions
 # =============================================================================
@@ -21,53 +20,13 @@ app.include_router(IAMRouter)
 app.include_router(StorageRouter)
 app.include_router(CERouter)
 
-# =============================================================================
-# 1. Credentials (Load the credentials)  --> This part will be moved to a separate module or credentials.py
-# ROUGH PLANNING FOR THE CREDENTIALS RETRIEVAL VIA PARAMETERS
-credential_fields = [
-    "type",
-    "project_id",
-    "private_key_id",
-    "private_key",
-    "client_email",
-    "client_id",
-    "auth_uri",
-    "token_uri",
-    "auth_provider_x509_cert_url",
-    "client_x509_cert_url",
-]
-
-
-def _get_missing_fields(service_account_info: dict) -> list[str]:
-    logger.add_info(
-        f"_get_missing_fields(): service_account_info: {service_account_info}"
-    )
-    missing_fields = [
-        field for field in credential_fields if field not in service_account_info
-    ]
-    return missing_fields
-
-
-async def get_credentials(
-    service_account_info: Annotated[dict | None, Body()] = None
-) -> Credentials:
-    if not service_account_info:
-        raise ValueError("No service account info is provided.", 401)
-    if _get_missing_fields(service_account_info):
-        raise ValueError(
-            f"Missing credentials fields: {_get_missing_fields(service_account_info)}",
-            401,
-        )
-    credentials = Credentials.from_service_account_info(service_account_info)
-    return credentials
-
 
 # =============================================================================
 # 2. APIs (Define the routes)
 # 2-1. The root route
 @app.get("/", response_model=APIResponse)
 @func_error_handler_decorator(logger=logger, is_api=True)
-def read_root(request: Request):
+def read_root():
     logger.add_info("read_root(): The root route is accessed.")
     message = "Welcome to the Mini Google Cloud Collector!\n\nAvailable routes:\n"
     message += StorageBucketCollector.get_route_messages()
@@ -81,7 +40,7 @@ def read_root(request: Request):
 # Example use: http://localhost/all-resources
 @app.post("/all-resources", response_model=APIResponse)
 @func_error_handler_decorator(logger=logger, is_api=True)
-def list_all_resources(credentials: Credentials = Depends(get_credentials)):
+def list_all_resources(credentials=Depends(get_credentials)):
     logger.add_info("list_all_resources(): The list_all_resources route is accessed.")
     sbc = StorageBucketCollector(credentials)
     irc = IAMRoleCollector(credentials)
