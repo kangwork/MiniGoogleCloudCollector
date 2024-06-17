@@ -30,7 +30,7 @@ def _get_credentials_from_env() -> Credentials:
     return credentials
 
 
-credential_fields = [
+all_fields = [
     "type",
     "project_id",
     "private_key_id",
@@ -41,15 +41,31 @@ credential_fields = [
     "token_uri",
     "auth_provider_x509_cert_url",
     "client_x509_cert_url",
+    "universe_domain",
 ]
+
+required_fields = {
+    "private_key": "",
+    "client_email": "",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "universe_domain": "googleapis.com",
+}
 
 
 @func_error_handler_decorator(logger=logger)
 def _get_missing_fields(service_account_info: dict) -> list[str]:
-    missing_fields = [
-        field for field in credential_fields if field not in service_account_info
-    ]
-    return missing_fields
+    missing_required_fields = []
+    for field in required_fields:
+        if field not in service_account_info:
+            default_value = required_fields[field]
+            if default_value:
+                logger.add_warning(
+                    f"Using default value for missing field ({field}={default_value})"
+                )
+                service_account_info[field] = default_value
+            else:
+                missing_required_fields.append(field)
+    return missing_required_fields
 
 
 @func_error_handler_decorator(logger=logger)
@@ -64,7 +80,7 @@ def get_credentials(
         return env_credentials
     if _get_missing_fields(service_account_info):
         raise ValueError(
-            f"Missing credentials fields: {_get_missing_fields(service_account_info)}",
+            f"Missing required credentials fields: {_get_missing_fields(service_account_info)}",
             401,
         )
     credentials = Credentials.from_service_account_info(service_account_info)
