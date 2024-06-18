@@ -7,9 +7,9 @@ class APIResponse(BaseModel):
     message: str = "Thanks for using the Mini Google Cloud Collector."
 
     def __init__(self, **data):
-        super().__init__(**data, length=self.get_length(data, data))
+        super().__init__(**data, length=self.get_length(data))
 
-    def get_length(cls, v, values) -> int:
+    def get_length(self, values) -> int:
         data = values.get("data")
         status_code = values.get("status_code", 200)
         if status_code == 200:
