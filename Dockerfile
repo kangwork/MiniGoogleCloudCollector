@@ -15,6 +15,6 @@ RUN pip install -r pip_requirements.txt
 
 COPY src/ .
 
-ENV GOOGLE_APPLICATION_CREDENTIALS="src/utils/key.json"
+ENV GOOGLE_APPLICATION_CREDENTIALS="utils/key.json"
 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

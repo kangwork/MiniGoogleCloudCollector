@@ -2,6 +2,7 @@ from google.cloud import iam_admin_v1 as iam
 from collectors.collector import Collector
 from utils.decorators import method_error_handler_decorator
 from models.iam_role import IAMRole
+from typing import List
 
 
 # ==========================================================================
@@ -36,7 +37,7 @@ class IAMRoleCollector(Collector):
         return IAMRole.from_gcp_object(response)
 
     @method_error_handler_decorator
-    def collect_resources(self) -> list[IAMRole]:
+    def collect_resources(self) -> List[IAMRole]:
         """
         Get all roles in a project
 

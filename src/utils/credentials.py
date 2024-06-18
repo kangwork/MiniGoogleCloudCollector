@@ -2,8 +2,9 @@ import os
 from google.oauth2.service_account import Credentials
 from utils.logging import get_sub_file_logger
 from utils.decorators import func_error_handler_decorator
-from typing import Annotated
+from typing_extensions import Annotated
 from fastapi import Body
+from typing import List, Union
 
 logger = get_sub_file_logger(__name__)
 
@@ -39,7 +40,7 @@ required_fields = {
 
 
 @func_error_handler_decorator(logger=logger)
-def _get_missing_fields(service_account_info: dict) -> list[str]:
+def _get_missing_fields(service_account_info: dict) -> List[str]:
     missing_required_fields = []
     for field in required_fields:
         if field not in service_account_info:
@@ -55,7 +56,7 @@ def _get_missing_fields(service_account_info: dict) -> list[str]:
 
 
 @func_error_handler_decorator(logger=logger)
-def get_credentials(input_dict: Annotated[dict | None, Body()] = None) -> Credentials:
+def get_credentials(input_dict: Annotated[Union[dict, None], Body()] = None) -> Credentials:
     if not input_dict:
         logger.add_warning("No input dictionary is provided.")
     else:

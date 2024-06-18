@@ -1,6 +1,8 @@
 from utils.logging import Logger, get_sub_file_logger
 from google.oauth2.service_account import Credentials
 from abc import ABC, abstractmethod
+from typing import Dict, Tuple
+
 
 
 class Collector(ABC):
@@ -23,7 +25,7 @@ class Collector(ABC):
         self.project_id = credentials.project_id
 
     @classmethod
-    def get_route_messages(self, route_messages: dict[str, (str, str)]) -> str:
+    def get_route_messages(self, route_messages: Dict[str, Tuple[str, str]]) -> str:
         """
         Get the route messages
 

@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from google.cloud.iam_admin_v1.types import Role as GCPIAMRole
+from typing import List
 
 
 class IAMRole(BaseModel):
@@ -11,7 +12,7 @@ class IAMRole(BaseModel):
     title: str
     description: str
     stage: str
-    included_permissions: list[str]
+    included_permissions: List[str]
     stage: GCPIAMRole.RoleLaunchStage
     etag: bytes
 

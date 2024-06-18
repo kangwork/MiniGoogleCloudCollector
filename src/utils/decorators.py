@@ -1,6 +1,5 @@
 import functools
 import inspect
-from models.response import APIResponse
 from fastapi.responses import JSONResponse
 
 

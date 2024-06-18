@@ -1,8 +1,9 @@
 from pydantic import BaseModel
+from typing import Dict, Union
 
 
 class APIResponse(BaseModel):
-    data: str | list | dict[str, list]
+    data: Union[str, list, Dict[str, list]]
     length: int = -1
     message: str = "Thanks for using the Mini Google Cloud Collector."
 
