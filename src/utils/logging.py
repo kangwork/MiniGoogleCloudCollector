@@ -54,7 +54,7 @@ class Logger:
         self._logger.critical(message)
 
 
-def setup_logger(logger: Logger, to_file: bool) -> None:
+def _setup_logger(logger: Logger, to_file: bool) -> None:
     """
     Ask a user if they want to log the output in a file or on the console
     """
@@ -67,24 +67,12 @@ def setup_logger(logger: Logger, to_file: bool) -> None:
     return
 
 
-def setup_main_file_logger(logger: Logger) -> None:
-    """
-    Set up the logger for the main file
-    """
-    # Clear the log file
-    with open("log.log", "w") as f:
-        f.write("")
-    setup_logger(logger, to_file=True)
-    logger.add_info("Starting the main program.")
-    return
-
-
 def get_sub_file_logger(module_name: str = __name__) -> Logger:
     """
-    Get the logger for the sub files
+    Get a logger for the sub files
     """
     logger = Logger(module_name)
-    setup_logger(logger, to_file=True)
+    _setup_logger(logger, to_file=True)
     if module_name == "main":
         with open("log.log", "w") as f:
             f.write("")
@@ -94,10 +82,8 @@ def get_sub_file_logger(module_name: str = __name__) -> Logger:
 
 def get_console_logger(module_name: str = __name__) -> Logger:
     """
-    Get the logger for the console
+    Get a logger for the console
     """
-    logger = Logger(
-        module_name
-    )  # name of the caller? or name of this file? --> name of the caller
-    setup_logger(logger, to_file=False)
+    logger = Logger(module_name)
+    _setup_logger(logger, to_file=False)
     return logger
