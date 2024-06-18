@@ -4,6 +4,7 @@ from collectors.iam_roles import IAMRoleCollector
 from utils.decorators import func_error_handler_decorator
 from models.response import APIResponse
 from utils.credentials import get_credentials
+from models import request
 
 IAMRouter = APIRouter(prefix="/iam", tags=["IAM"])
 logger = get_sub_file_logger(__name__)
@@ -13,7 +14,8 @@ logger = get_sub_file_logger(__name__)
 # Example use: http://localhost/iam/roles
 @IAMRouter.post("/roles", response_model=APIResponse)
 @func_error_handler_decorator(logger=logger, is_api=True)
-def list_iam_roles(credentials=Depends(get_credentials)):
+def list_iam_roles(request: request.ListResourcesRequest):
+    credentials = request.credentials
     logger.add_info("list_iam_roles(): The list_iam_roles route is accessed.")
     irc = IAMRoleCollector(credentials)
     resources = irc.collect_resources()
@@ -28,7 +30,8 @@ def list_iam_roles(credentials=Depends(get_credentials)):
 # Example use: http://localhost/iam/roles/261
 @IAMRouter.post("/roles/{role_id}", response_model=APIResponse)
 @func_error_handler_decorator(logger=logger, is_api=True)
-def get_iam_role(role_id: int, credentials=Depends(get_credentials)):
+def get_iam_role(request: request.GetResourceRequest):
+    credentials, role_id = request.credentials, request.param
     logger.add_info(
         f"get_iam_role(role_id={role_id}): The get_iam_role route is accessed."
     )

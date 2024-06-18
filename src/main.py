@@ -1,5 +1,5 @@
 import os
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 from routers.iam import IAMRouter
 from routers.storage import StorageRouter
 from routers.ce import CERouter
@@ -9,7 +9,7 @@ from collectors.iam_roles import IAMRoleCollector
 from collectors.ce_instances import CEInstanceCollector
 from utils.decorators import func_error_handler_decorator
 from models.response import APIResponse
-from utils.credentials import get_credentials
+from models import request
 
 # A main program to call all the api functions
 # =============================================================================
@@ -40,7 +40,8 @@ def read_root():
 # Example use: http://localhost/all-resources
 @app.post("/all-resources", response_model=APIResponse)
 @func_error_handler_decorator(logger=logger, is_api=True)
-def list_all_resources(credentials=Depends(get_credentials)):
+def list_all_resources(request: request.ListResourcesRequest):
+    credentials = request.credentials
     logger.add_info("list_all_resources(): The list_all_resources route is accessed.")
     sbc = StorageBucketCollector(credentials)
     irc = IAMRoleCollector(credentials)

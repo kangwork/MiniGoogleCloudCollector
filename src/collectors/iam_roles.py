@@ -23,14 +23,14 @@ class IAMRoleCollector(Collector):
         return super().get_route_messages(route_messages)
 
     @method_error_handler_decorator
-    def collect_resource(self, role_id: int) -> IAMRole:
+    def collect_resource(self, role_id: str) -> IAMRole:
         """
         Get a role's details
 
-        :param role_id, int, the role ID
+        :param role_id, str, the role ID
 
         :return: dict, the role's details"""
-        role_name = f"projects/{self.project_id}/roles/{str(role_id)}"
+        role_name = f"projects/{self.project_id}/roles/{role_id}"
         client = iam.IAMClient(credentials=self.credentials)
         request = iam.GetRoleRequest(name=role_name)
         response = client.get_role(request=request)
