@@ -21,6 +21,3 @@ class APIResponse(BaseModel):
             elif isinstance(data, str):
                 return 1
         return 0
-
-    class Config:
-        arbitrary_types_allowed = True
