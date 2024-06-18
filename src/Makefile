@@ -20,4 +20,5 @@ run: main.py $(shell find . -name "*.py") activate $(requirements_stamp)
 
 clean:
 	find . -name "__pycache__" -exec rm -rf {} \;
-	rm -f $(requirements_stamp)
+	rm -rf ../__pycache__;
+	rm -f $(requirements_stamp);
