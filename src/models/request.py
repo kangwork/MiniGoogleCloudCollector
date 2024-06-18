@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import Dict
 from utils.credentials import get_credentials
+from abc import ABC
 
 # class SecretData(BaseModel): I don't know if it is better to define this class, so I will leave it till the meeting today.
 #     private_key: str
@@ -11,8 +12,7 @@ from utils.credentials import get_credentials
 #     def credentials(self):
 #         return get_credentials(self.dict())
 
-
-class ResourceAccessRequest(BaseModel):
+class ResourceAccessRequest(BaseModel, ABC):
     secret_data: Dict[str, str]
 
     @property
