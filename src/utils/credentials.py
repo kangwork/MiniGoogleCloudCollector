@@ -55,19 +55,25 @@ def _get_missing_fields(service_account_info: dict) -> list[str]:
 
 
 @func_error_handler_decorator(logger=logger)
-def get_credentials(
-    service_account_info: Annotated[dict | None, Body()] = None
-) -> Credentials:
-    if not service_account_info:
+def get_credentials(input_dict: Annotated[dict | None, Body()] = None) -> Credentials:
+    if not input_dict:
+        logger.add_warning("No input dictionary is provided.")
+    else:
+        secret_data = input_dict.get("secret_data")
+        if not secret_data:
+            logger.add_warning(
+                "No secret_data field is provided in the input dictionary."
+            )
+    if not input_dict or not secret_data:
         logger.add_warning(
-            "No service account info is provided; using GOOGLE_APPLICATION_CREDENTIALS from the environment."
+            "Trying to get credentials from the GOOGLE_APPLICATION_CREDENTIALS environment variable."
         )
         env_credentials = _get_credentials_from_env()
         return env_credentials
-    if _get_missing_fields(service_account_info):
+    if _get_missing_fields(secret_data):
         raise ValueError(
-            f"Missing required credentials fields: {_get_missing_fields(service_account_info)}",
+            f"Missing required credentials fields: {_get_missing_fields(secret_data)}",
             401,
         )
-    credentials = Credentials.from_service_account_info(service_account_info)
+    credentials = Credentials.from_service_account_info(secret_data)
     return credentials
