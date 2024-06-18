@@ -1,7 +1,6 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 from utils.logging import get_sub_file_logger
 from collectors.storage_buckets import StorageBucketCollector
-from utils.credentials import get_credentials
 from utils.decorators import func_error_handler_decorator
 from models.response import APIResponse
 from models import request

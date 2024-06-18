@@ -2,9 +2,7 @@ import os
 from google.oauth2.service_account import Credentials
 from utils.logging import get_sub_file_logger
 from utils.decorators import func_error_handler_decorator
-from typing_extensions import Annotated
-from fastapi import Body
-from typing import List, Union, Dict
+from typing import List, Dict
 from utils.exceptions import CustomException
 
 logger = get_sub_file_logger(__name__)

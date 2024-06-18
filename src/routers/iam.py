@@ -1,9 +1,8 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 from utils.logging import get_sub_file_logger
 from collectors.iam_roles import IAMRoleCollector
 from utils.decorators import func_error_handler_decorator
 from models.response import APIResponse
-from utils.credentials import get_credentials
 from models import request
 
 IAMRouter = APIRouter(prefix="/iam", tags=["IAM"])

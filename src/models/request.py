@@ -1,8 +1,6 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from typing import Dict
 from utils.credentials import get_credentials
-from fastapi import Depends, Query
-from typing import Optional
 
 # class SecretData(BaseModel): I don't know if it is better to define this class, so I will leave it till the meeting today.
 #     private_key: str
