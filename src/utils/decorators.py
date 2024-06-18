@@ -29,7 +29,6 @@ def func_error_handler_decorator(logger, is_api=False):
         def wrapper(*args, **kwargs):
             try:
                 return func(*args, **kwargs)
-            # except error or exception:
             except Exception as e:
                 caller_info = f"{func.__name__}"
 

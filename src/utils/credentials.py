@@ -67,7 +67,8 @@ def get_credentials(secret_data: Dict[str, str] = None) -> Credentials:
         return env_credentials
     if _get_missing_fields(secret_data):
         raise CustomException(
-            f"Missing required credentials fields: {_get_missing_fields(secret_data)}", 401
+            f"Missing required credentials fields: {_get_missing_fields(secret_data)}",
+            401,
         )
     credentials = Credentials.from_service_account_info(secret_data)
     return credentials
