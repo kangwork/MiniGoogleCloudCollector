@@ -42,7 +42,9 @@ def list_ce_instances_in_zone(zone: str, credentials=Depends(get_credentials)):
 # 2-4-3. A route to get details of a specific Compute Engine instance
 @CERouter.post("/instances/{zone}/{instance_name}", response_model=APIResponse)
 @func_error_handler_decorator(logger=logger, is_api=True)
-def get_ce_instance(zone: str, instance_name: str, credentials=Depends(get_credentials)):
+def get_ce_instance(
+    zone: str, instance_name: str, credentials=Depends(get_credentials)
+):
     logger.add_info(
         f"get_ce_instance(zone={zone}, instance_name={instance_name}): The get_ce_instance route is accessed."
     )

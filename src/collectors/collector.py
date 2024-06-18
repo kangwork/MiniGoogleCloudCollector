@@ -4,7 +4,6 @@ from abc import ABC, abstractmethod
 from typing import Dict, Tuple
 
 
-
 class Collector(ABC):
     """
     A class to represent a Collector

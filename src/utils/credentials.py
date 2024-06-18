@@ -56,7 +56,9 @@ def _get_missing_fields(service_account_info: dict) -> List[str]:
 
 
 @func_error_handler_decorator(logger=logger)
-def get_credentials(input_dict: Annotated[Union[dict, None], Body()] = None) -> Credentials:
+def get_credentials(
+    input_dict: Annotated[Union[dict, None], Body()] = None
+) -> Credentials:
     if not input_dict:
         logger.add_warning("No input dictionary is provided.")
     else:
