@@ -4,7 +4,8 @@ from utils.logging import get_sub_file_logger
 from utils.decorators import func_error_handler_decorator
 from typing_extensions import Annotated
 from fastapi import Body
-from typing import List, Union
+from typing import List, Union, Dict
+from utils.exceptions import CustomException
 
 logger = get_sub_file_logger(__name__)
 
@@ -32,6 +33,7 @@ def _get_credentials_from_env() -> Credentials:
 
 
 required_fields = {
+    "project_id": "",
     "private_key": "",
     "client_email": "",
     "token_uri": "https://oauth2.googleapis.com/token",
@@ -56,27 +58,16 @@ def _get_missing_fields(service_account_info: dict) -> List[str]:
 
 
 @func_error_handler_decorator(logger=logger)
-def get_credentials(
-    input_dict: Annotated[Union[dict, None], Body()] = None
-) -> Credentials:
-    if not input_dict:
-        logger.add_warning("No input dictionary is provided.")
-    else:
-        secret_data = input_dict.get("secret_data")
-        if not secret_data:
-            logger.add_warning(
-                "No secret_data field is provided in the input dictionary."
-            )
-    if not input_dict or not secret_data:
+def get_credentials(secret_data: Dict[str, str] = None) -> Credentials:
+    if not secret_data:
         logger.add_warning(
             "Trying to get credentials from the GOOGLE_APPLICATION_CREDENTIALS environment variable."
         )
         env_credentials = _get_credentials_from_env()
         return env_credentials
     if _get_missing_fields(secret_data):
-        raise ValueError(
-            f"Missing required credentials fields: {_get_missing_fields(secret_data)}",
-            401,
+        raise CustomException(
+            f"Missing required credentials fields: {_get_missing_fields(secret_data)}", 401
         )
     credentials = Credentials.from_service_account_info(secret_data)
     return credentials
