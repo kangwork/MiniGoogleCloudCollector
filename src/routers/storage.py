@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from utils.logging import get_sub_file_logger
 from collectors.storage_buckets import StorageBucketCollector
 from utils.decorators import func_error_handler_decorator
-from models.response import APIResponse
+from models.response import APIResponse, APIResponses
 from models import request
 
 
@@ -13,7 +13,7 @@ logger = get_sub_file_logger(__name__)
 ### 2-2. Storage Bucket APIs
 # Example use: http://localhost/storage/buckets/airbyte_testing_001
 # 2-2-1. A route to list all storage buckets in a project
-@StorageRouter.post("/buckets", response_model=APIResponse)
+@StorageRouter.post("/buckets", response_model=APIResponses)
 @func_error_handler_decorator(logger=logger, is_api=True)
 def list_storage_buckets(request: request.ListResourcesRequest):
     credentials = request.credentials
@@ -23,8 +23,7 @@ def list_storage_buckets(request: request.ListResourcesRequest):
     sbc = StorageBucketCollector(credentials)
     resources = sbc.collect_resources()
     return {
-        "data": [resource.__repr__() for resource in resources],
-        "message": "List of all storage buckets in the project.",
+        "results": [APIResponse(data=dict(resource)) for resource in resources],
     }
 
 
@@ -40,6 +39,5 @@ def get_storage_bucket(request: request.GetResourceRequest):
     sbc = StorageBucketCollector(credentials)
     resource = sbc.collect_resource(bucket_name)
     return {
-        "data": resource.__repr__(),
-        "message": "Details of the specific storage bucket.",
+        "data": dict(resource),
     }

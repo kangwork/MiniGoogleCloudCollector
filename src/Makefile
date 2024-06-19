@@ -14,7 +14,7 @@ activate: $(venv)
 	@echo "Activate your venv by running 'source $(venv)/bin/activate'";
 
 run: main.py $(shell find . -name "*.py") activate $(requirements_stamp) 
-	export GOOGLE_APPLICATION_CREDENTIALS="utils/key.json";
+	@echo "Run 'export GOOGLE_APPLICATION_CREDENTIALS=\"utils/key.json\";' to set the environment variable";
 	python main.py;
 
 .PHONY: clean activate

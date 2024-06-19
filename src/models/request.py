@@ -3,6 +3,7 @@ from typing import Dict
 from utils.credentials import get_credentials
 from abc import ABC
 
+
 class ResourceAccessRequest(BaseModel, ABC):
     secret_data: Dict[str, str]
 
@@ -17,6 +18,7 @@ class ListResourcesRequest(ResourceAccessRequest):
 
 class GetResourceRequest(ResourceAccessRequest):
     param: str
+
 
 class GetCEInstanceRequest(ResourceAccessRequest):
     zone: str

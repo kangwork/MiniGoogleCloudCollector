@@ -1,7 +1,7 @@
 from utils.logging import Logger, get_sub_file_logger
 from google.oauth2.service_account import Credentials
 from abc import ABC, abstractmethod
-from typing import Dict, Tuple
+from typing import Dict, Tuple, List
 
 
 class Collector(ABC):
@@ -38,9 +38,9 @@ class Collector(ABC):
             raise NotImplementedError(
                 "The route_messages should be provided from the child collector class."
             )
-        messages = "\n"
+        messages = ""
         for route, (description, example) in route_messages.items():
-            messages += f"{route}\n{description}\n(Example: {example})\n"
+            messages += f"{route}\n{description}\n(Example: {example})"
         return messages
 
     @abstractmethod

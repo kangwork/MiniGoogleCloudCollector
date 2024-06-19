@@ -1,23 +1,27 @@
 from pydantic import BaseModel
-from typing import Dict, Union
+from typing import Dict, Union, List
 
 
 class APIResponse(BaseModel):
-    data: Union[str, list, Dict[str, list]]
-    length: int = -1
-    message: str = "Thanks for using the Mini Google Cloud Collector."
+    data: dict
 
     def __init__(self, **data):
-        super().__init__(**data, length=self.get_length(data))
+        super().__init__(**data)
 
-    def get_length(self, values) -> int:
-        data = values.get("data")
+
+class APIResponses(BaseModel):
+    results: Union[List[APIResponse], Dict[str, List[APIResponse]]]
+    total_count: int = 0
+
+    def __init__(self, **data):
+        super().__init__(**data, total_count=self.get_total_count(data))
+
+    def get_total_count(self, values) -> int:
+        results = values.get("results")
         status_code = values.get("status_code", 200)
         if status_code == 200:
-            if isinstance(data, list):
-                return len(data)
-            elif isinstance(data, dict):
-                return sum(len(v) for v in data.values())
-            elif isinstance(data, str):
-                return 1
+            if isinstance(results, list):
+                return len(results)
+            elif isinstance(results, dict):
+                return sum(len(v) for v in results.values())
         return 0

@@ -8,7 +8,7 @@ from collectors.storage_buckets import StorageBucketCollector
 from collectors.iam_roles import IAMRoleCollector
 from collectors.ce_instances import CEInstanceCollector
 from utils.decorators import func_error_handler_decorator
-from models.response import APIResponse
+from models.response import APIResponse, APIResponses
 from models import request
 
 # A main program to call all the api functions
@@ -28,17 +28,20 @@ app.include_router(CERouter)
 @func_error_handler_decorator(logger=logger, is_api=True)
 def read_root():
     logger.add_info("read_root(): The root route is accessed.")
-    message = "Welcome to the Mini Google Cloud Collector!\n\nAvailable routes:\n"
-    message += StorageBucketCollector.get_route_messages()
-    message += IAMRoleCollector.get_route_messages()
-    message += CEInstanceCollector.get_route_messages()
-    return {"data": "", "message": message}
+    data = {}
+    data["heading"] = (
+        "Welcome to the Mini Google Cloud Collector!\n\nAvailable routes:\n"
+    )
+    data["storage_buckets"] = StorageBucketCollector.get_route_messages()
+    data["iam_roles"] = IAMRoleCollector.get_route_messages()
+    data["ce_instances"] = CEInstanceCollector.get_route_messages()
+    return {"data": data}
 
 
 ### 2-5. All Three at Once
 # 2-5-1. A route to list all resources in a project
 # Example use: http://localhost/all-resources
-@app.post("/all-resources", response_model=APIResponse)
+@app.post("/all-resources", response_model=APIResponses)
 @func_error_handler_decorator(logger=logger, is_api=True)
 def list_all_resources(request: request.ListResourcesRequest):
     credentials = request.credentials
@@ -53,14 +56,18 @@ def list_all_resources(request: request.ListResourcesRequest):
     }
     repr_resources = {
         "storage_buckets": [
-            repr(resource) for resource in resources["storage_buckets"]
+            APIResponse(data=dict(resource))
+            for resource in resources["storage_buckets"]
         ],
-        "iam_roles": [repr(resource) for resource in resources["iam_roles"]],
-        "ce_instances": [repr(resource) for resource in resources["ce_instances"]],
+        "iam_roles": [
+            APIResponse(data=dict(resource)) for resource in resources["iam_roles"]
+        ],
+        "ce_instances": [
+            APIResponse(data=dict(resource)) for resource in resources["ce_instances"]
+        ],
     }
     return {
-        "data": repr_resources,
-        "message": "List of all resources in the project.",
+        "results": repr_resources,
     }
 
 
