@@ -35,8 +35,15 @@ def func_error_handler_decorator(logger, is_api=False):
                 signature = inspect.signature(func)
                 bound_arguments = signature.bind(*args, **kwargs)
                 bound_arguments.apply_defaults()
+                safe_args = bound_arguments.arguments
+                if safe_args.get("secret_data", None):
+                    safe_args["secret_data"]= "REDACTED"
+                for key, val in safe_args.items():
+                    if hasattr(val, "secret_data"):
+                        val.secret_data = "REDACTED"
+                        safe_args[key] = val
                 logger.add_error(
-                    f"{caller_info}({bound_arguments.arguments}): {str(e)}"
+                    f"{caller_info}({safe_args}): {str(e)}"
                 )
                 if not is_api:
                     raise e
