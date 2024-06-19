@@ -1,5 +1,5 @@
 import logging
-
+logfile = "../logs/log.log"
 
 # A class to log messages
 class Logger:
@@ -59,7 +59,7 @@ def _setup_logger(logger: Logger, to_file: bool) -> None:
     Ask a user if they want to log the output in a file or on the console
     """
     if to_file:
-        logger.set_file_handler("log.log")
+        logger.set_file_handler(logfile)
 
     else:
         logger.set_stream_handler()
@@ -74,7 +74,7 @@ def get_sub_file_logger(module_name: str = __name__) -> Logger:
     logger = Logger(module_name)
     _setup_logger(logger, to_file=True)
     if module_name == "main":
-        with open("log.log", "w") as f:
+        with open(logfile, "w") as f:
             f.write("")
             logger.add_info("Starting the main program.")
     return logger
