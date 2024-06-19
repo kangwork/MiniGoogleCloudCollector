@@ -20,4 +20,4 @@ ENV GOOGLE_APPLICATION_CREDENTIALS="utils/key.json"
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 
 # docker build -t myapp .
-# docker run -d -p 8000:8000 -e GOOGLE_APPLICATION_CREDENTIALS="src/utils/key.json" myapp
+# docker run -d -p 8000:8000 -e GOOGLE_APPLICATION_CREDENTIALS="utils/key.json" myapp

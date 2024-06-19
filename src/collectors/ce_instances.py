@@ -69,7 +69,7 @@ class CEInstanceCollector(Collector):
         return CEInstance.from_gcp_object(instance_client.get(request=request))
 
     @method_error_handler_decorator
-    def collect_resources_in_zone(self, zone: str) -> list[CEInstance]:
+    def collect_resources_in_zone(self, zone: str) -> List[CEInstance]:
         """
         List all instances in a project
 
