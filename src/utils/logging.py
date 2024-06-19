@@ -1,5 +1,7 @@
 import logging
+
 logfile = "../logs/log.log"
+
 
 # A class to log messages
 class Logger:
