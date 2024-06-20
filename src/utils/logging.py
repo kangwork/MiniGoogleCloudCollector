@@ -28,6 +28,8 @@ class Logger:
 
     def set_file_handler(self, log_file: str):
         # File Handler(For File Output)
+        with open(log_file, "a") as f:
+            f.write("")
         self._file_handler = logging.FileHandler(log_file)
         self._file_handler.setFormatter(self._formatter)
         self._logger.addHandler(self._file_handler)
@@ -75,7 +77,7 @@ def get_sub_file_logger(module_name: str = __name__) -> Logger:
     """
     logger = Logger(module_name)
     _setup_logger(logger, to_file=True)
-    if module_name == "main":
+    if module_name == "__main__":
         with open(logfile, "w") as f:
             f.write("")
             logger.add_info("Starting the main program.")
