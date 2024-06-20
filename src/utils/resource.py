@@ -1,12 +1,12 @@
 # Abstract Class for All Resources
-class Resource():
+class Resource:
     def __init__(self, resource: dict):
         """
         Initialize the resource
         """
         self._resource = resource
         return
-    
+
     def __repr__(self) -> str:
         """
         Convert the resource to a string

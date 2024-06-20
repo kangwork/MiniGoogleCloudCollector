@@ -17,7 +17,7 @@ Follow the instructions below to set up the GOOGLE_APPLICATION_CREDENTIALS envir
 1. Open a terminal.
 2. Run the following command:
    ```shell
-   export GOOGLE_APPLICATION_CREDENTIALS="../local/mini-collector/key.json"
+   export GOOGLE_APPLICATION_CREDENTIALS="path/to/service/account/key.json"
    ```
 3. Replace "../local/mini-collector/key.json" with the path to your credentials file.
 
@@ -44,13 +44,34 @@ Follow the instructions below to set up the GOOGLE_APPLICATION_CREDENTIALS envir
 
 
 ## Modules
-The program uses the following modules:
-- resources/storage_buckets.py
-- resources/iam_roles.py
-- resources/vm_instances.py
-- utils/credentials.py
-- utils/logging.py
-- utils/resource.py
-- utils/roles.py
-- utils/vm_instances.py
-- main.py
+```
+MiniGoogleCloudCollector
+├── README.md
+├── log.log
+├── pkg
+│   └── pip_requirements.txt
+├── src
+│   ├── Makefile
+│   ├── collectors
+│   │   ├── ce_instances.py
+│   │   ├── collector.py
+│   │   ├── iam_roles.py
+│   │   └── storage_buckets.py
+│   ├── log.log
+│   ├── main.py
+│   ├── models
+│   │   ├── ce_instance.py
+│   │   ├── iam_role.py
+│   │   └── storage_bucket.py
+│   ├── routers
+│   │   ├── ce.py
+│   │   ├── iam.py
+│   │   └── storage.py
+│   └── utils
+│       ├── credentials.py
+│       ├── decorators.py
+│       ├── key.json
+│       ├── logging.py
+│       └── resource.py
+└── venv
+```

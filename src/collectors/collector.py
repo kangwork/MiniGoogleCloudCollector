@@ -1,4 +1,4 @@
-from utils.logging import get_sub_file_logger
+from utils.logging import Logger, get_sub_file_logger
 from google.oauth2.service_account import Credentials
 
 
@@ -11,15 +11,17 @@ class Collector:
     - credentials: Credentials, the credentials
     - project_id: str, the project ID
     """
-    def __init__(self, collector_name: str, credentials: Credentials=None):
-        self.logger = get_sub_file_logger(collector_name)
-        if credentials and isinstance(credentials, Credentials):
-            self.credentials = credentials
-            self.project_id = credentials.project_id
-        else:
-            self.credentials = None
-            self.project_id = None
 
+    logger: Logger
+    credentials: Credentials
+    project_id: str
+
+    def __init__(self, collector_name: str, credentials: Credentials):
+        self.logger = get_sub_file_logger(collector_name)
+        self.credentials = credentials
+        self.project_id = credentials.project_id
+
+    @classmethod
     def get_route_messages(self, route_messages: dict[str, (str, str)]) -> str:
         """
         Get the route messages
@@ -31,7 +33,9 @@ class Collector:
         :return: str, the route messages
         """
         if not route_messages:
-            raise NotImplementedError("The route_messages should be provided from the child collector class.")
+            raise NotImplementedError(
+                "The route_messages should be provided from the child collector class."
+            )
         messages = "\n"
         for route, (description, example) in route_messages.items():
             messages += f"{route}\n{description}\n(Example: {example})\n"
