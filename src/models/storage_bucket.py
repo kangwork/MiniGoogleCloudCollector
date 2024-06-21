@@ -1,9 +1,6 @@
 from pydantic import BaseModel
-from google.cloud.storage.client import Client
-from google.cloud.storage.acl import BucketACL, DefaultObjectACL
 from google.cloud.storage.bucket import Bucket
 from typing import Any, Dict, Optional, Set
-from pydantic import Field
 
 
 class StorageBucket(BaseModel):
@@ -12,12 +9,12 @@ class StorageBucket(BaseModel):
     """
 
     name: str
-    properties: Dict[str, Any] = Field(default_factory=dict)
-    changes: Set[str] = Field(default_factory=set)
-    client: Optional[Client] = None
-    acl: Optional[BucketACL] = None
-    default_object_acl: Optional[DefaultObjectACL] = None
-    label_removals: Set[str] = Field(default_factory=set)
+    properties: Dict[str, Any] = {}
+    changes: Set[str] = set()
+    client: str  # Client
+    acl: str  # BucketACL = None
+    default_object_acl: str  # DefaultObjectACL = None
+    label_removals: Set[str] = set()
     user_project: Optional[str] = None
 
     @classmethod
@@ -28,9 +25,9 @@ class StorageBucket(BaseModel):
             name=obj["name"],
             properties=obj["_properties"],
             changes=obj["_changes"],
-            client=obj["_client"],
-            acl=obj["_acl"],
-            default_object_acl=obj["_default_object_acl"],
+            client=repr(obj["_client"]),
+            acl=repr(obj["_acl"]),
+            default_object_acl=repr(obj["_default_object_acl"]),
             label_removals=obj["_label_removals"],
             user_project=obj["_user_project"],
         )
@@ -39,11 +36,3 @@ class StorageBucket(BaseModel):
 
     class Config:
         arbitrary_types_allowed = True
-        json_encoders = {
-            BucketACL: lambda v: v.__dict__,
-            DefaultObjectACL: lambda v: v.__dict__,
-            Client: lambda v: v.__dict__,
-        }
-
-    def __str__(self):
-        return self.name
