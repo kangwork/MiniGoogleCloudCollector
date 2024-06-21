@@ -82,7 +82,9 @@ def get_credentials(secret_data: Dict[str, str] = None) -> Credentials:
 
 @func_error_handler_decorator(logger=logger)
 def _decrypt_file(input_path: str) -> str:
-    filename = f"/temp_key_files/decrypted_{datetime.now().strftime('%Y%m%d%H%M%S')}.json"
+    filename = (
+        f"/temp_key_files/decrypted_{datetime.now().strftime('%Y%m%d%H%M%S')}.json"
+    )
     try:
         command = [
             "gpg",
@@ -92,10 +94,12 @@ def _decrypt_file(input_path: str) -> str:
             "--decrypt",
             f"--passphrase={os.getenv('GPG_PASSPHRASE')}",
             f"--output={filename}",
-            input_path
+            input_path,
         ]
         subprocess.run(command, check=True)
         return filename
     except Exception as e:
-        raise Exception(f"Error decrypting the file.\nIt is likely that the pass phrase was incorrect. Please pass the credentials as a dictionary.", 401)
-    
+        raise Exception(
+            f"Error decrypting the file.\nIt is likely that the pass phrase was incorrect. Please pass the credentials as a dictionary.",
+            401,
+        )
