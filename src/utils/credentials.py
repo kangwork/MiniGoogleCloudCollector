@@ -12,14 +12,14 @@ logger = get_sub_file_logger(__name__)
 
 @func_error_handler_decorator(logger=logger)
 def _get_credentials_from_env() -> Credentials:
-    enc_credentials_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
-
-    if not enc_credentials_path:
-        message = "GOOGLE_APPLICATION_CREDENTIALS environment variable is not set.\n\
-            Please set it to the path of the encrypted service account key file."
-        logger.add_error(message)
-        raise Exception(message, 401)
-
+    if os.getcwd().endswith("src"):
+        enc_credentials_path = os.path.join("..", "mnt", "encrypted_keys", "key.json.gpg")
+    elif os.getcwd().endswith("app"):
+        enc_credentials_path = os.path.join("/", "mnt", "encrypted_keys", "key.json.gpg")
+    else:
+        logger.add_error(f"Current Path: {os.getcwd()}, which is not expected.")
+        raise Exception("Current Path is not expected.", 401)
+    
     if not os.path.exists(enc_credentials_path):
         message = f"There was no encrypted service information file found at {enc_credentials_path}.\n\
             Please put it under the correct mount path, or give your credentials as a dictionary."
@@ -67,7 +67,7 @@ def _get_missing_fields(service_account_info: dict) -> List[str]:
 def get_credentials(secret_data: Dict[str, str] = None) -> Credentials:
     if not secret_data:
         logger.add_warning(
-            "Trying to get credentials from the GOOGLE_APPLICATION_CREDENTIALS environment variable."
+            "Trying to get credentials from the encrypted key file, as no credentials were passed."
         )
         env_credentials = _get_credentials_from_env()
         return env_credentials
