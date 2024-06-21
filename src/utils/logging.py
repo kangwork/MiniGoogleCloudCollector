@@ -1,5 +1,7 @@
 import logging
 
+logfile = "../logs/log.log"
+
 
 # A class to log messages
 class Logger:
@@ -26,6 +28,8 @@ class Logger:
 
     def set_file_handler(self, log_file: str):
         # File Handler(For File Output)
+        with open(log_file, "a") as f:
+            f.write("")
         self._file_handler = logging.FileHandler(log_file)
         self._file_handler.setFormatter(self._formatter)
         self._logger.addHandler(self._file_handler)
@@ -54,12 +58,12 @@ class Logger:
         self._logger.critical(message)
 
 
-def setup_logger(logger: Logger, to_file: bool) -> None:
+def _setup_logger(logger: Logger, to_file: bool) -> None:
     """
     Ask a user if they want to log the output in a file or on the console
     """
     if to_file:
-        logger.set_file_handler("log.log")
+        logger.set_file_handler(logfile)
 
     else:
         logger.set_stream_handler()
@@ -67,26 +71,14 @@ def setup_logger(logger: Logger, to_file: bool) -> None:
     return
 
 
-def setup_main_file_logger(logger: Logger) -> None:
-    """
-    Set up the logger for the main file
-    """
-    # Clear the log file
-    with open("log.log", "w") as f:
-        f.write("")
-    setup_logger(logger, to_file=True)
-    logger.add_info("Starting the main program.")
-    return
-
-
 def get_sub_file_logger(module_name: str = __name__) -> Logger:
     """
-    Get the logger for the sub files
+    Get a logger for the sub files
     """
     logger = Logger(module_name)
-    setup_logger(logger, to_file=True)
-    if module_name == "main":
-        with open("log.log", "w") as f:
+    _setup_logger(logger, to_file=True)
+    if module_name == "__main__":
+        with open(logfile, "w") as f:
             f.write("")
             logger.add_info("Starting the main program.")
     return logger
@@ -94,10 +86,8 @@ def get_sub_file_logger(module_name: str = __name__) -> Logger:
 
 def get_console_logger(module_name: str = __name__) -> Logger:
     """
-    Get the logger for the console
+    Get a logger for the console
     """
-    logger = Logger(
-        module_name
-    )  # name of the caller? or name of this file? --> name of the caller
-    setup_logger(logger, to_file=False)
+    logger = Logger(module_name)
+    _setup_logger(logger, to_file=False)
     return logger
