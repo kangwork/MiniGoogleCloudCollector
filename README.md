@@ -143,11 +143,6 @@ To run the program by cloning the repository, follow these steps:
     ```
     Replace `password` with the password you set when encrypting the key file.
 
-    4-3) Set your *key file path* as an environment variable.
-    ```bash
-    export GOOGLE_APPLICATION_CREDENTIALS=../mnt/encrypted_keys/key.json.gpg
-    ```
-
 <br><br>
 
 5. Run the program.
