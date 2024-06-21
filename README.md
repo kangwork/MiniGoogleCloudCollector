@@ -1,77 +1,163 @@
 # MiniGoogleCloudCollector
-A repository for the SpaceONE Mini Google Collector Assignment
-
 This program retrieves data from Google Cloud Platform (GCP) and displays it in a web browser.
-
 
 The program retrieves the following data from GCP:
 - Storage buckets
 - IAM roles
 - VM instances
 
+## How to run the program
 
-Note that the GOOGLE_APPLICATION_CREDENTIALS environment variable must be set to the path of the credentials file. 
+There are two simple ways to run the program:
 
-## How to Set Up the Environment Variable
-Follow the instructions below to set up the GOOGLE_APPLICATION_CREDENTIALS environment variable.
-1. Open a terminal.
-2. Run the following command:
-   ```shell
-   export GOOGLE_APPLICATION_CREDENTIALS="path/to/service/account/key.json"
-   ```
-3. Replace "../local/mini-collector/key.json" with the path to your credentials file.
+[A) Using Docker](#a-using-docker) (No cloning required; you can skip the installation of Python and its dependencies.)
+
+[B) Using Python](#b-using-python) (You will need to install Python and its dependencies.)
+
+We recommend using Docker to run the program.
+
+### A. Using Docker
+
+To run the program using Docker, follow these steps:
+
+1. Pull the Docker image from Docker Hub.
+
+    You can find the latest version of the Docker image at this link: [Docker Hub](https://hub.docker.com/r/irenekang/minigooglecloudcollector/tags?page=1&ordering=last_updated)
+
+    Pull the Docker image by running the following command:
+    ```bash
+    docker pull irenekang/minigooglecloudcollector:v1.0.1
+    ```
+2. Run the Docker container.
+
+    There are four options when running the Docker container. You can choose one of the following options:
+    <!-- <!-- list of links to headings -- To use link to headings, use the following format: [link text](#heading-name) -->
+    [1) Basic run](#1-basic-run)
+
+    [2) Run with logs](#2-run-with-logs)
+
+    [3) Run with credentials key file](#3-run-with-credentials-key-file)
+
+    [4) Run with logs and credentials key file](#4-run-with-logs-and-credentials-key-file)
 
 
-## How to Run the Program
-1. Navigate to `src/`.
+    #### 1) Basic run
+    ```bash
+    docker run -p 8000:8000 irenekang/minigooglecloudcollector:v1.0.1
+    ```
 
-2. Execute the main program.
-    (Note: Make sure you installed all the dependencies in your environment.)
+    <br><br>
 
-    You can execute the program by simply running:
-    ```shell
+    #### 2) Run with logs
+    Make sure you have a directory that you can mount to the container.
+    You will be able to retrieve the `log.log` file in the directory you mounted.
+    ```bash
+    docker run -p 8000:8000 -v $(pwd)/mnt/logs:/mnt/logs irenekang/minigooglecloudcollector:v1.0.1
+    ```
+    Replace `$(pwd)/mnt/logs` with the path to the directory where you want to save the log file.
+
+    <br><br>
+
+    #### 3) Run with credentials key file
+
+    **3-1) Encrypt your key file.**
+    
+    For the security of your GCP account, we ask you to encrypt your credentials key file before mounting it to the container.
+
+    To do that, we have written a script for you: [encrypt_key_file.sh](encrypt_key_file.sh).
+
+    You can also download the script by running the following command:
+
+    ```bash
+    curl -O https://raw.githubusercontent.com/kangwork/MiniGoogleCloudCollector/main/encrypt_key_file.sh
+    ```
+    
+    Then, run the script by running the following command:
+
+    ```bash
+    ./encrypt_key_file.sh
+    ```
+
+    You will be asked to enter your credentials key file path and set your own *password*.
+
+    Then, as the message says, the encrypted file will be saved in `mnt/encrypted_keys` directory.
+
+    You can rename the directory(not the file itself), but you will need to mount the directory to the container's `/mnt/encrypted_keys` directory.
+
+    <br>
+
+    **3-2) Mount the encrypted key file to the container.**
+
+    You have to pass the *password* as ENCRYPTION_KEY you entered when encrypting the key file as an environment variable.
+
+    ```bash
+    docker run -p 8000:8000 -v $(pwd)/mnt/encrypted_keys:/mnt/encrypted_keys -e ENCRYPTION_KEY=password irenekang/minigooglecloudcollector:v1.0.1
+    ```
+
+    You can replace `$(pwd)/mnt/encrypted_keys` with the path to the directory where the encrypted key file(`key.json.gpg`) is located.
+    Replace `password` with the password you set when encrypting the key file.
+
+    <br><br>
+
+
+    #### 4) Run with logs and credentials key file
+    
+    Follow the steps in [3) Run with credentials key file](#3-run-with-credentials-key-file) to encrypt your key file and mount it to the container.
+
+    You can run the container with logs and credentials key file by running the following command:
+
+    ```bash
+    docker run -p 8000:8000 -v /path/to/your/logs/directory:/mnt/logs -v /path/to/your/encrypted_keys/directory:/mnt/encrypted_keys -e ENCRYPTION_KEY=password irenekang/minigooglecloudcollector:v1.0.1
+    ```
+
+<br><br><br>
+
+### B. Using Python
+
+To run the program by cloning the repository, follow these steps:
+
+1. Clone the repository.
+
+2. Navigate to the `src` directory.
+
+3. (Optional) Assuming you have Python installed, create a virtual environment and activate it.
+    ```bash
+    make activate
+    ```
+    (If you don't have Python installed, you can install it by following the instructions at this link: [Python Installation Guide](https://realpython.com/installing-python/))
+
+    Follow the message in the terminal to activate the virtual environment.
+
+
+
+4. (Optional) To use the credentials key file:
+    
+    4-1) Encrypt your key file.
+    ```bash
+    ../encrypt_key_file.sh
+    ```
+
+    4-2) Set your *password* as an environment variable.
+    ```bash
+    export ENCRYPTION_KEY=password
+    ```
+    Replace `password` with the password you set when encrypting the key file.
+
+    4-3) Set your *key file path* as an environment variable.
+    ```bash
+    export GOOGLE_APPLICATION_CREDENTIALS=../mnt/encrypted_keys/key.json.gpg
+    ```
+
+<br><br>
+
+5. Run the program.
+- If you have set up a virtual environment, run the following command:
+    ```bash
     make run
     ```
-
-    Or, run the following command to start the program manually.
-    ```shell
-    uvicorn main:app --reload
+- Otherwise, run the following command:
+    ```bash
+    pip install -r ../pkg/pip_requirements.txt
+    python main.py
     ```
 
-3. Open a web browser and go to http://localhost:8000 to view the data.
-
-4. Press Ctrl+C to stop the program.
-
-
-## Modules
-```
-MiniGoogleCloudCollector
-├── README.md
-├── log.log
-├── pkg
-│   └── pip_requirements.txt
-├── src
-│   ├── Makefile
-│   ├── collectors
-│   │   ├── ce_instances.py
-│   │   ├── collector.py
-│   │   ├── iam_roles.py
-│   │   └── storage_buckets.py
-│   ├── log.log
-│   ├── main.py
-│   ├── models
-│   │   ├── ce_instance.py
-│   │   ├── iam_role.py
-│   │   └── storage_bucket.py
-│   ├── routers
-│   │   ├── ce.py
-│   │   ├── iam.py
-│   │   └── storage.py
-│   └── utils
-│       ├── credentials.py
-│       ├── decorators.py
-│       ├── key.json
-│       ├── logging.py
-│       └── resource.py
-└── venv
-```

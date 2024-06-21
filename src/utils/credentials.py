@@ -83,7 +83,7 @@ def get_credentials(secret_data: Dict[str, str] = None) -> Credentials:
 @func_error_handler_decorator(logger=logger)
 def _decrypt_file(input_path: str) -> str:
     filename = (
-        f"/temp_key_files/decrypted_{datetime.now().strftime('%Y%m%d%H%M%S')}.json"
+        f"decrypted_{datetime.now().strftime('%Y%m%d%H%M%S')}.json"
     )
     encryption_key = os.getenv("ENCRYPTION_KEY")
     if not encryption_key:

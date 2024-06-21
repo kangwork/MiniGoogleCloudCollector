@@ -34,10 +34,16 @@ done
 
 echo "Encrypting key file..."
 
-if [ ! -d mnt/encrypted_keys ]; then
-    mkdir -p mnt/encrypted_keys
+if [ $(pwd | awk -F'/' '{print $NF}') = "src" ]; then
+    output_filepath="../mnt/encrypted_keys/key.json.gpg"
+else
+    if [ ! -d mnt/encrypted_keys ]; then
+        mkdir -p mnt/encrypted_keys
+    fi
+    output_filepath="mnt/encrypted_keys/key.json.gpg"
 fi
-gpg --quiet --batch --yes --passphrase="${user_key}" --output=mnt/encrypted_keys/key.json.gpg -c $key_file
-echo "Encrypted key file is stored in mnt/encrypted_keys/key.json.gpg."
-echo "Delete it if you are done with mounting the mnt/encrypted_keys/ directory."
+
+gpg --quiet --batch --yes --passphrase="${user_key}" --output=$output_filepath -c $key_file
+echo "Encrypted key file is stored in $output_filepath."
+echo "Delete it if you are done with mounting the the directory."
 exit 0

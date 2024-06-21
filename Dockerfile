@@ -17,7 +17,6 @@ RUN pip install -r pip_requirements.txt
 ENV ENCRYPTION_KEY=""
 ENV GOOGLE_APPLICATION_CREDENTIALS="/mnt/encrypted_keys/key.json.gpg"
 
-RUN mkdir -p "/temp_key_files"
 RUN mkdir -p "/mnt/logs"
 RUN mkdir -p "/mnt/encrypted_keys"
 COPY src/ .
