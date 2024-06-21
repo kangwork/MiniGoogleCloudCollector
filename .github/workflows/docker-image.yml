@@ -50,16 +50,12 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Extract version from tag
-        id: extract_version
-        run: echo "::set-output name=version::${GITHUB_REF/refs\/tags\/v/}"
-
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           platforms: linux/amd64
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/${{ github.repository }}:${{ steps.extract_version.outputs.version }}
+          tags: ${{ secrets.DOCKER_USERNAME }}/MiniGoogleCloudCollector:v${{ github.event.inputs.version }}
           build-args: |
                       GPG_PASSPHRASE=${{ secrets.GPG_PASSPHRASE }}
