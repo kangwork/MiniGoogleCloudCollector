@@ -14,18 +14,17 @@ RUN pip install --upgrade pip
 COPY pkg/pip_requirements.txt .
 RUN pip install -r pip_requirements.txt
 
-ARG GPG_PASSPHRASE
-ENV GPG_PASSPHRASE="${GPG_PASSPHRASE}"
-
-ENV LOCAL_MNT_KEYS_DIR="encrypted_mnt/keys"
-ENV ENCRYPTED_KEY_FILE="${LOCAL_MNT_KEYS_DIR}/key.json.gpg"
-ENV GOOGLE_APPLICATION_CREDENTIALS="/${ENCRYPTED_KEY_FILE}"
+ENV ENCRYPTION_KEY=""
+ENV GOOGLE_APPLICATION_CREDENTIALS="/mnt/encrypted_keys/key.json.gpg"
 
 RUN mkdir -p "/temp_key_files"
+RUN mkdir -p "/mnt/logs"
+RUN mkdir -p "/mnt/encrypted_keys"
 COPY src/ .
+
+EXPOSE 8000
 
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
 
 # docker build -t myapp .
-# docker run -d -p 8000:8000 -v "$(pwd)/encrypted_mnt/keys":/encrypted_mnt/keys -v "$(pwd)/logs":/logs myapp
-# docker run -d -p 8000:8000 -v "$(pwd)/encrypted_mnt/keys":/encrypted_mnt/keys -v "$(pwd)/logs":/logs -e GPG_PASSPHRASE="passphraseToDecrypt" myapp
+# docker run -d -p 8000:8000 -v "$(pwd)/mnt/encrypted_keys":/mnt/encrypted_keys -v "$(pwd)/mnt/logs":/mnt/logs -e ENCRYPTION_KEY="123" myapp

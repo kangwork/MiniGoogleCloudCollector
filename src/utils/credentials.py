@@ -22,7 +22,7 @@ def _get_credentials_from_env() -> Credentials:
 
     if not os.path.exists(enc_credentials_path):
         message = f"There was no encrypted service information file found at {enc_credentials_path}.\n\
-            Please put it under the correct mount path, or give your credentials information as a dictionary."
+            Please put it under the correct mount path, or give your credentials as a dictionary."
         logger.add_error(message)
         raise Exception(message, 401)
 
@@ -85,21 +85,29 @@ def _decrypt_file(input_path: str) -> str:
     filename = (
         f"/temp_key_files/decrypted_{datetime.now().strftime('%Y%m%d%H%M%S')}.json"
     )
-    try:
+    encryption_key = os.getenv("ENCRYPTION_KEY")
+    if not encryption_key:
+        raise Exception(
+            "ENCRYPTION_KEY environment variable is not set.\nPlease set it when running the container, or pass the credentials it as a dictionary.",
+            401,
+        )
+    else:
+        logger.add_info(encryption_key)
         command = [
             "gpg",
             "--quiet",
             "--batch",
             "--yes",
             "--decrypt",
-            f"--passphrase={os.getenv('GPG_PASSPHRASE')}",
+            f"--passphrase={encryption_key}",
             f"--output={filename}",
             input_path,
         ]
-        subprocess.run(command, check=True)
+        try:
+            subprocess.run(command, check=True)
+        except subprocess.CalledProcessError as e:
+            raise Exception(
+                f"Error decrypting the file.\nIt is likely that the pass phrase was incorrect. Please pass the credentials as a dictionary.",
+                401,
+            )
         return filename
-    except Exception as e:
-        raise Exception(
-            f"Error decrypting the file.\nIt is likely that the pass phrase was incorrect. Please pass the credentials as a dictionary.",
-            401,
-        )

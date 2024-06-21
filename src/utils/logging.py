@@ -1,6 +1,6 @@
 import logging
 
-logfile = "../logs/log.log"
+logfile = "../mnt/logs/log.log"
 
 
 # A class to log messages
