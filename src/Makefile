@@ -11,14 +11,15 @@ $(requirements_stamp): $(requirements) $(venv)
 	touch $(requirements_stamp);
 
 activate: $(venv)
-	echo "source $(venv)/bin/activate";
-
+	@echo "Activate your venv by running 'source $(venv)/bin/activate'";
 
 run: main.py $(shell find . -name "*.py") activate $(requirements_stamp) 
+	@echo "Run 'export GOOGLE_APPLICATION_CREDENTIALS=\"utils/key.json\";' to set the environment variable";
 	python main.py;
 
 .PHONY: clean activate
 
 clean:
 	find . -name "__pycache__" -exec rm -rf {} \;
-	rm -f $(requirements_stamp)
+	rm -rf ../__pycache__;
+	rm -f $(requirements_stamp);

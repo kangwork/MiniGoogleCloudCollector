@@ -2,6 +2,7 @@ from google.cloud import iam_admin_v1 as iam
 from collectors.collector import Collector
 from utils.decorators import method_error_handler_decorator
 from models.iam_role import IAMRole
+from typing import List
 
 
 # ==========================================================================
@@ -22,21 +23,21 @@ class IAMRoleCollector(Collector):
         return super().get_route_messages(route_messages)
 
     @method_error_handler_decorator
-    def collect_resource(self, role_id: int) -> IAMRole:
+    def collect_resource(self, role_id: str) -> IAMRole:
         """
         Get a role's details
 
-        :param role_id, int, the role ID
+        :param role_id, str, the role ID
 
         :return: dict, the role's details"""
-        role_name = f"projects/{self.project_id}/roles/{str(role_id)}"
+        role_name = f"projects/{self.project_id}/roles/{role_id}"
         client = iam.IAMClient(credentials=self.credentials)
         request = iam.GetRoleRequest(name=role_name)
         response = client.get_role(request=request)
         return IAMRole.from_gcp_object(response)
 
     @method_error_handler_decorator
-    def collect_resources(self) -> list[IAMRole]:
+    def collect_resources(self) -> List[IAMRole]:
         """
         Get all roles in a project
 

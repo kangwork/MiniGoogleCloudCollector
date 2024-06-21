@@ -1,8 +1,8 @@
 from google.cloud import compute_v1
-from utils.resource import Resource
 from collectors.collector import Collector
 from utils.decorators import method_error_handler_decorator
 from models.ce_instance import CEInstance
+from typing import List
 
 
 # =============================================================================
@@ -30,7 +30,7 @@ class CEInstanceCollector(Collector):
         return super().get_route_messages(route_messages)
 
     @method_error_handler_decorator
-    def collect_resources(self) -> list[CEInstance]:
+    def collect_resources(self) -> List[CEInstance]:
         """
         List all instances in a project
 
@@ -44,14 +44,10 @@ class CEInstanceCollector(Collector):
         for _, instances_scoped_list in instance_client.aggregated_list(
             project=self.project_id
         ):
-
-            if instances_scoped_list.warning:
-                continue
-            else:
-                all_instances.extend(
-                    CEInstance.from_gcp_object(instance)
-                    for instance in instances_scoped_list.instances
-                )
+            all_instances.extend(
+                CEInstance.from_gcp_object(instance)
+                for instance in instances_scoped_list.instances
+            )
 
         return all_instances
 
@@ -73,7 +69,7 @@ class CEInstanceCollector(Collector):
         return CEInstance.from_gcp_object(instance_client.get(request=request))
 
     @method_error_handler_decorator
-    def collect_resources_in_zone(self, zone: str) -> list[CEInstance]:
+    def collect_resources_in_zone(self, zone: str) -> List[CEInstance]:
         """
         List all instances in a project
 
