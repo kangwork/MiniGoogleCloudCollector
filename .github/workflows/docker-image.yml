@@ -64,7 +64,7 @@ jobs:
         run: |
           curl -X POST -H 'Content-type: application/json' --data '{
           "text":
-            "<!channel> Docker image ${{ secrets.DOCKER_USERNAME }}/minigooglecloudcollector:v${{ github.event.inputs.version }} has been built and pushed to Docker Hub.\n<https://hub.docker.com/r/${{ secrets.DOCKER_USERNAME }}/minigooglecloudcollector/tags?page=1&ordering=last_updated|View on Docker Hub>"
+            "<!channel> Docker image <https://hub.docker.com/r/${{ secrets.DOCKER_USERNAME }}/minigooglecloudcollector/tags?page=1&ordering=last_updated|${{ secrets.DOCKER_USERNAME }}/minigooglecloudcollector:v${{ github.event.inputs.version }}> has been built and pushed to Docker Hub."
           }' ${{ secrets.SLACK_WEBHOOK }}
        
       - name: Logout from Docker Hub
