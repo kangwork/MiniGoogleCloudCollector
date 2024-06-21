@@ -56,6 +56,6 @@ jobs:
           context: .
           platforms: linux/amd64
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/MiniGoogleCloudCollector:v${{ github.event.inputs.version }}
+          tags: ${{ secrets.DOCKER_USERNAME }}/minigooglecloudcollector:v${{ github.event.inputs.version }}
           build-args: |
                       GPG_PASSPHRASE=${{ secrets.GPG_PASSPHRASE }}
