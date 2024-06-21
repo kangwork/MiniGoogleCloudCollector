@@ -23,7 +23,7 @@ jobs:
         if: github.event_name == 'workflow_dispatch'
         run: |
           git tag -a "v${{ github.event.inputs.version }}" -m "Release version ${{ github.event.inputs.version }}"
-          git push https://${{ secrets.KANGWORK_TOKEN }}@github.com/kangwork/${{ github.repository }}.git "v${{ github.event.inputs.version }}"
+          git push https://${{ secrets.KANGWORK_TOKEN }}@github.com/${{ github.repository }}.git "v${{ github.event.inputs.version }}"
 
       
       - name: Revert Git user
