@@ -6,13 +6,13 @@ The program retrieves the following data from GCP:
 - IAM roles
 - VM instances
 
-## How to run the program
+## How to Run the Program
 
 There are two simple ways to run the program:
 
-[A) Using Docker](#a-using-docker) (No cloning required; you can skip the installation of Python and its dependencies.)
+[A. Using Docker](#a-using-docker) (No cloning required <span style="color: grey"> unless you want to encrypt your credentials key file.</span>)
 
-[B) Using Python](#b-using-python) (You will need to install Python and its dependencies.)
+[B. Using Python](#b-using-python) (You will need to install Python and its dependencies.)
 
 We recommend using Docker to run the program.
 
@@ -20,7 +20,7 @@ We recommend using Docker to run the program.
 
 To run the program using Docker, follow these steps:
 
-1. Pull the Docker image from Docker Hub.
+1. <u>**Pull the Docker image from Docker Hub.**</u>
 
     You can find the latest version of the Docker image at this link: [Docker Hub](https://hub.docker.com/r/irenekang/minigooglecloudcollector/tags?page=1&ordering=last_updated)
 
@@ -28,7 +28,7 @@ To run the program using Docker, follow these steps:
     ```bash
     docker pull irenekang/minigooglecloudcollector:v1.0.1
     ```
-2. Run the Docker container.
+2. <u>**Run the Docker container.**</u>
 
     There are four options when running the Docker container. You can choose one of the following options:
     <!-- <!-- list of links to headings -- To use link to headings, use the following format: [link text](#heading-name) -->
@@ -116,11 +116,15 @@ To run the program using Docker, follow these steps:
 
 To run the program by cloning the repository, follow these steps:
 
-1. Clone the repository.
+1. <u>**Clone the repository**</u>
+    
+    <br><br>
 
-2. Navigate to the `src` directory.
+2. <u>**Navigate to the `src` directory**</u>
 
-3. (Optional) Assuming you have Python installed, create a virtual environment and activate it.
+    <br><br>
+
+3. <u>*(Optional)* **Assuming you have Python installed, create a virtual environment and activate it**</u>
     ```bash
     make activate
     ```
@@ -128,16 +132,16 @@ To run the program by cloning the repository, follow these steps:
 
     Follow the message in the terminal to activate the virtual environment.
 
+    <br><br>
 
-
-4. (Optional) To use the credentials key file:
+4. <u>*(Optional)* **To use the credentials key file:**</u>
     
-    4-1) Encrypt your key file.
+    **4-1) Encrypt your key file.**
     ```bash
     ../encrypt_key_file.sh
     ```
 
-    4-2) Set your *password* as an environment variable.
+    **4-2) Set your *password* as an environment variable.**
     ```bash
     export ENCRYPTION_KEY=password
     ```
@@ -145,7 +149,7 @@ To run the program by cloning the repository, follow these steps:
 
 <br><br>
 
-5. Run the program.
+5. <u>**Run the program**</u>
 - If you have set up a virtual environment, run the following command:
     ```bash
     make run
