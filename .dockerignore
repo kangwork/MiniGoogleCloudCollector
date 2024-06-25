@@ -3,3 +3,5 @@ __pycache__/
 *.timestamp
 *.json
 *.log
+.gitignore
+.dockerignore
