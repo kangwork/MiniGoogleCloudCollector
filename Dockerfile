@@ -19,6 +19,7 @@ ENV ENCRYPTION_KEY=""
 RUN mkdir -p "/mnt/logs"
 RUN mkdir -p "/mnt/encrypted_keys"
 COPY src/ .
+COPY encrypt_key_file.sh .
 
 EXPOSE 8000
 
