@@ -10,7 +10,7 @@ The program retrieves the following data from GCP:
 
 There are two simple ways to run the program:
 
-[A. Using Docker](#a-using-docker) (No cloning required <span style="color: grey"> unless you want to encrypt your credentials key file.</span>)
+[A. Using Docker](#a-using-docker) (No cloning required <span style="color: grey"> unless you want to encrypt your key file locally: [3-b](#3-b-encrypt-your-key-file-on-your-local-machine-and-mount-the-encrypted-key-file-to-the-container)</span>)
 
 [B. Using Python](#b-using-python) (You will need to install Python and its dependencies.)
 
@@ -60,11 +60,48 @@ To run the program using Docker, follow these steps:
 
     #### 3) Run with credentials key file
 
-    **3-1) Encrypt your key file.**
-    
-    For the security of your GCP account, we ask you to encrypt your credentials key file before mounting it to the container.
+    For the security of your GCP account, the program will not accept the credentials key file directly. Instead, you need to encrypt the key file and pass the encryption key as an environment variable.
 
-    To do that, we have written a script for you: [encrypt_key_file.sh](encrypt_key_file.sh).
+    You can either
+    - [3-a) Mount the key file to the container directly and encrypt your key file on the container](#3-a-mount-the-key-file-to-the-container-directly-and-encrypt-your-key-file-on-the-container)
+    - [3-b) Encrypt your key file on your local machine and mount the encrypted key file to the container](#3-b-encrypt-your-key-file-on-your-local-machine-and-mount-the-encrypted-key-file-to-the-container)
+
+    <br><br>
+
+    #### 3-a) Mount the key file to the container directly and encrypt your key file on the container
+
+    **1) Mount the key file to the container**
+
+    Replace the following:
+    - `$(pwd)/mnt/encrypted_keys` with the directory you want to mount to the container.
+    - `486` with the <span style="color: pink">*YoUR_oWn_EnCryPTiOn_kEY*</span> that you want to use as a password.
+
+    ```bash
+    docker run -p 8000:8000 -v $(pwd)/mnt/encrypted_keys:/mnt/encrypted_keys -e ENCRYPTION_KEY=486 irenekang/minigooglecloudcollector:v1.0.1
+    ```
+
+    Now, put your credentials key file in the directory you mounted.
+
+    <br>
+
+    **2) Encrypt your key file on the container**
+
+    On the container, run the following command to encrypt the key file:
+
+    ```bash
+    ./encrypt_key_file.sh
+    ```
+
+    Follow the instructions to encrypt the key file. You must enter the <span style="color: pink">*YoUR_oWn_EnCryPTiOn_kEY*</span> that you set when running the container.
+
+    <br><br>
+
+
+    #### 3-b) Encrypt your key file on your local machine and mount the encrypted key file to the container
+
+    **1) Encrypt your key file**
+    
+    To encrypt the key file locally, you can clone [encrypt_key_file.sh](encrypt_key_file.sh).
 
     You can also download the script by running the following command:
 
@@ -78,24 +115,22 @@ To run the program using Docker, follow these steps:
     ./encrypt_key_file.sh
     ```
 
-    You will be asked to enter your credentials key file path and set your own *password*.
+    You will be asked to enter your credentials key file path and set your own <span style="color: pink">*YoUR_oWn_EnCryPTiOn_kEY*</span>, it will serve as a password to decrypt the key file.
 
     Then, as the message says, the encrypted file will be saved in `mnt/encrypted_keys` directory.
 
-    You can rename the directory(not the file itself), but you will need to mount the directory to the container's `/mnt/encrypted_keys` directory.
+    NOTE: You can rename the directory(not the file itself), but you will mount the directory to the container's `/mnt/encrypted_keys` directory.
 
     <br>
 
-    **3-2) Mount the encrypted key file to the container.**
+    **2) Mount the encrypted key file to the container.**
 
-    You have to pass the *password* as ENCRYPTION_KEY you entered when encrypting the key file as an environment variable.
-
+    Replace the following:
+    - `$(pwd)/mnt/encrypted_keys` with the directory where the encrypted key file(`key.json.gpg`) is located.
+    - `486` with the <span style="color: pink">*YoUR_oWn_EnCryPTiOn_kEY*</span> you set when encrypting the key file.
     ```bash
-    docker run -p 8000:8000 -v $(pwd)/mnt/encrypted_keys:/mnt/encrypted_keys -e ENCRYPTION_KEY=password irenekang/minigooglecloudcollector:v1.0.1
+    docker run -p 8000:8000 -v $(pwd)/mnt/encrypted_keys:/mnt/encrypted_keys -e ENCRYPTION_KEY=486 irenekang/minigooglecloudcollector:v1.0.1
     ```
-
-    You can replace `$(pwd)/mnt/encrypted_keys` with the path to the directory where the encrypted key file(`key.json.gpg`) is located.
-    Replace `password` with the password you set when encrypting the key file.
 
     <br><br>
 
@@ -107,8 +142,14 @@ To run the program using Docker, follow these steps:
     You can run the container with logs and credentials key file by running the following command:
 
     ```bash
-    docker run -p 8000:8000 -v /path/to/your/logs/directory:/mnt/logs -v /path/to/your/encrypted_keys/directory:/mnt/encrypted_keys -e ENCRYPTION_KEY=password irenekang/minigooglecloudcollector:v1.0.1
+    docker run -p 8000:8000 -v /path/to/your/logs/directory:/mnt/logs -v /path/to/your/encrypted_keys/directory:/mnt/encrypted_keys -e ENCRYPTION_KEY=486 irenekang/minigooglecloudcollector:v1.0.1
     ```
+
+    Again, please make sure to replace:
+    
+    - `/path/to/your/logs/directory` and `/path/to/your/encrypted_keys/directory` with the paths to the directories where you want to save the log file and the encrypted key file, respectively.
+
+    - `486` with the <span style="color: pink">*YoUR_oWn_EnCryPTiOn_kEY*</span> you set when encrypting the key file.
 
 <br><br><br>
 
@@ -141,11 +182,11 @@ To run the program by cloning the repository, follow these steps:
     ../encrypt_key_file.sh
     ```
 
-    **4-2) Set your *password* as an environment variable.**
+    **4-2) Set the environment variable.**
     ```bash
-    export ENCRYPTION_KEY=password
+    export ENCRYPTION_KEY=486
     ```
-    Replace `password` with the password you set when encrypting the key file.
+    Replace `486` with the <span style="color: pink">*YoUR_oWn_EnCryPTiOn_kEY*</span> you set when encrypting the key file.
 
 <br><br>
 
