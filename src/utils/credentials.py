@@ -12,14 +12,14 @@ logger = get_sub_file_logger(__name__)
 
 @func_error_handler_decorator(logger=logger)
 def _get_credentials_from_env() -> Credentials:
-    if os.getcwd().endswith("src"):
-        enc_credentials_path = os.path.join("..", "mnt", "encrypted_keys", "key.json.gpg")
-    elif os.getcwd().endswith("app"):
-        enc_credentials_path = os.path.join("/", "mnt", "encrypted_keys", "key.json.gpg")
+    if os.getcwd().endswith("src") or os.getcwd().endswith("app"):
+        enc_credentials_path = os.path.join(
+            "..", "mnt", "encrypted_keys", "key.json.gpg"
+        )
     else:
         logger.add_error(f"Current Path: {os.getcwd()}, which is not expected.")
         raise Exception("Current Path is not expected.", 401)
-    
+
     if not os.path.exists(enc_credentials_path):
         message = f"There was no encrypted service information file found at {enc_credentials_path}.\n\
             Please put it under the correct mount path, or give your credentials as a dictionary."
@@ -82,9 +82,7 @@ def get_credentials(secret_data: Dict[str, str] = None) -> Credentials:
 
 @func_error_handler_decorator(logger=logger)
 def _decrypt_file(input_path: str) -> str:
-    filename = (
-        f"decrypted_{datetime.now().strftime('%Y%m%d%H%M%S')}.json"
-    )
+    filename = f"decrypted_{datetime.now().strftime('%Y%m%d%H%M%S')}.json"
     encryption_key = os.getenv("ENCRYPTION_KEY")
     if not encryption_key:
         raise Exception(

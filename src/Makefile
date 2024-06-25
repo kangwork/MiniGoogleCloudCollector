@@ -6,17 +6,17 @@ requirements_stamp = requirements.timestamp
 $(venv):
 	python -m venv $(venv);
 
-$(requirements_stamp): $(requirements) $(venv)
-	$(venv)/bin/pip install -r $(requirements)
+$(requirements_stamp): $(venv) $(requirements)
 	touch $(requirements_stamp);
+	$(venv)/bin/pip install -r $(requirements);
 
 activate: $(venv)
-	@echo "Activate your venv by running 'source $(venv)/bin/activate'";
+	@echo "Make sure you activated your venv by running 'source $(venv)/bin/activate'";
 
-run: main.py $(shell find . -name "*.py") activate $(requirements_stamp) 
+run: activate $(requirements_stamp)
 	python main.py;
 
-.PHONY: clean activate
+.PHONY: clean activate run
 
 clean:
 	find . -name "__pycache__" -exec rm -rf {} \;
