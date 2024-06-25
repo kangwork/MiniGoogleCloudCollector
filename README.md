@@ -26,7 +26,7 @@ To run the program using Docker, follow these steps:
 
     Pull the Docker image by running the following command:
     ```bash
-    docker pull irenekang/minigooglecloudcollector:v1.0.1
+    docker pull irenekang/minigooglecloudcollector:v1.0.4
     ```
 2. <u>**Run the Docker container.**</u>
 
