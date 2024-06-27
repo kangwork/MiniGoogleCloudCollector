@@ -6,6 +6,23 @@ The program retrieves the following data from GCP:
 - IAM roles
 - VM instances
 
+<br>
+
+## Table of Contents
+- [Live Site](#live-site)
+- [How to Run the Program](#how-to-run-the-program)
+    - [A. Using Docker](#a-using-docker)
+    - [B. Using Python](#b-using-python)
+
+<br>
+
+## Live Site
+You can access the live site at this link: [MiniGoogleCloudCollector](http://3.99.217.168:8000/docs).
+
+**Note:** Not all functionalities and features are available directly through this site. For full functionality <span style="color: grey"> (e.g., access to log files, using key credentials files) </span>, please follow the steps outlined later in this document.
+
+<br>
+
 ## How to Run the Program
 
 There are two simple ways to run the program:
